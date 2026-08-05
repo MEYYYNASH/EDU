@@ -296,6 +296,7 @@ html, body {
   margin-bottom: 14px;
   font-size: 16px;
   font-weight: 700;
+}
 
 .arrow-circle-btn-sm {
   width: 28px;
@@ -503,12 +504,14 @@ body.dark-mode .bottom-nav {
 
 /* Forms & Inputs */
 .form-group {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-label {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-secondary);
   margin-bottom: 6px;
@@ -523,6 +526,7 @@ body.dark-mode .bottom-nav {
   color: var(--text-primary);
   font-size: 14px;
   outline: none;
+  display: block;
 }
 
 .form-input:focus {
