@@ -32,6 +32,7 @@ const translations = {
     urgent_label: "Urgent",
     edit_profile_btn: "Edit Profile & Change Photo",
     achievements_title: "Achievements & Badges",
+    community_title: "Student Directory & Friends",
     tools_title: "Study Tools & Platform Controls",
     pomo_btn: "Focus Timer",
     notes_btn: "Study Notes",
@@ -67,6 +68,7 @@ const translations = {
     urgent_label: "បន្ទាន់",
     edit_profile_btn: "កែប្រែប្រវត្តិរូប និងប្តូររូបភាព",
     achievements_title: "សមិទ្ធផល និងបេកប្តូរ",
+    community_title: "សហគមន៍សិស្ស និងមិត្តភក្តិ",
     tools_title: "ឧបករណ៍សិក្សា និងការគ្រប់គ្រង",
     pomo_btn: "នាឡិកាផ្តោតអារម្មណ៍",
     notes_btn: "កំណត់ត្រាសិក្សា",
@@ -114,8 +116,10 @@ const AppState = {
     aiCount: 0,
     quizzesPassed: 0,
     completedCourses: 0,
-    avatar: "assets/default_avatar.jpg"
+    avatar: "assets/default_avatar.jpg",
+    friends: []
   },
+  activeChatTargetEmail: null,
   tempAvatar: null,
   modalUploadedVideoUrl: "",
   currentTab: "home",
@@ -125,6 +129,8 @@ const AppState = {
   videos: JSON.parse(localStorage.getItem('edu_admin_videos')) || [],
   notes: JSON.parse(localStorage.getItem('edu_user_notes')) || initialNotes,
   courses: getStoredCourses(),
+  allUsers: JSON.parse(localStorage.getItem('edu_all_users')) || [],
+  chats: JSON.parse(localStorage.getItem('edu_user_chats')) || {},
   badges: [
     {
       id: "streak_14",
@@ -181,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderRecentVisitedList();
   renderStudentCard();
   renderAchievementsGrid();
+  renderCommunityUsers();
   renderVideoStream();
   renderUserCoursesGrid();
   renderNotes();
@@ -221,6 +228,7 @@ function applyLanguage(lang) {
   renderFavoritesCard();
   renderRecentVisitedList();
   renderAchievementsGrid();
+  renderCommunityUsers();
 }
 
 // Check if current user is Super Admin (penhbormey011427809@gmail.com or admin@gmail.com)
@@ -421,6 +429,149 @@ function deleteVideoAsAdmin(id) {
   }
 }
 
+// 👥 Render Student Directory & Friends System
+function renderCommunityUsers() {
+  const container = document.getElementById("community-users-list");
+  if (!container) return;
+
+  AppState.allUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  const isKm = AppState.lang === 'km';
+  const currentUserEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
+
+  // Filter out current user from student directory
+  const otherStudents = AppState.allUsers.filter(u => u.email && u.email.toLowerCase() !== currentUserEmail);
+
+  if (otherStudents.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:18px 0; color:var(--text-muted); font-size:13px;">
+        ${isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។ បង្កើតគណនីបន្ថែមដើម្បីធ្វើការឆាត!' : 'No other students registered yet. Create another account to add friends & chat!'}
+      </div>
+    `;
+    return;
+  }
+
+  const userFriends = AppState.user.friends || [];
+
+  container.innerHTML = otherStudents.map(u => {
+    const isFriend = userFriends.includes(u.email);
+    return `
+      <div class="item-row" style="border:1px solid var(--border-subtle); padding:10px 14px; border-radius:16px;">
+        <img src="${u.avatar || 'assets/default_avatar.jpg'}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--color-royal);">
+        <div class="item-info">
+          <div class="item-title">${u.name}</div>
+          <div class="item-subtitle">${u.school || 'Student'} • @${u.username || 'user'}</div>
+        </div>
+        ${isFriend ? `
+          <button class="btn-primary" onclick="openChatModal('${u.email}')" style="width:auto; padding:6px 14px; font-size:12px;">
+            <i class="ri-chat-3-line"></i> ${isKm ? 'ឆាត' : 'Chat'}
+          </button>
+        ` : `
+          <button class="btn-secondary" onclick="addFriend('${u.email}')" style="width:auto; padding:6px 14px; font-size:12px; border-color:var(--color-royal); color:var(--color-royal);">
+            <i class="ri-user-add-line"></i> ${isKm ? '+ បន្ថែមមិត្ត' : '+ Add Friend'}
+          </button>
+        `}
+      </div>
+    `;
+  }).join('');
+}
+
+// Add Friend Action
+function addFriend(targetEmail) {
+  if (!AppState.isLoggedIn) {
+    alert("Please sign in to add friends!");
+    openModal("auth-modal");
+    return;
+  }
+
+  if (!AppState.user.friends) AppState.user.friends = [];
+  if (!AppState.user.friends.includes(targetEmail)) {
+    AppState.user.friends.push(targetEmail);
+    if (AppState.isLoggedIn) {
+      localStorage.setItem("edu_user_session", JSON.stringify(AppState.user));
+    }
+    renderCommunityUsers();
+    playAudioChime("success");
+    alert("✅ Friend added successfully! You can now send real-time chat messages.");
+  }
+}
+
+// Open Live Chat Modal with selected Friend
+function openChatModal(targetEmail) {
+  AppState.allUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  const targetUser = AppState.allUsers.find(u => u.email && u.email.toLowerCase() === targetEmail.toLowerCase());
+  
+  if (!targetUser) return;
+
+  AppState.activeChatTargetEmail = targetEmail;
+
+  const nameEl = document.getElementById("chat-target-name");
+  const avatarEl = document.getElementById("chat-target-avatar");
+  if (nameEl) nameEl.innerText = targetUser.name;
+  if (avatarEl) avatarEl.src = targetUser.avatar || "assets/default_avatar.jpg";
+
+  renderChatMessages();
+  openModal("chat-modal");
+}
+
+// Render Messages between current user and target friend
+function renderChatMessages() {
+  const container = document.getElementById("chat-messages-box");
+  if (!container || !AppState.activeChatTargetEmail) return;
+
+  AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
+
+  const myEmail = AppState.user.email.toLowerCase();
+  const friendEmail = AppState.activeChatTargetEmail.toLowerCase();
+  const chatKey = [myEmail, friendEmail].sort().join("___");
+
+  const thread = AppState.chats[chatKey] || [];
+
+  if (thread.length === 0) {
+    container.innerHTML = `<div style="text-align:center; margin:auto; color:var(--text-muted); font-size:12.5px;">Say hello to start chatting! 👋</div>`;
+    return;
+  }
+
+  container.innerHTML = thread.map(m => {
+    const isMine = m.sender === myEmail;
+    return `
+      <div class="chat-bubble ${isMine ? 'chat-bubble-own' : 'chat-bubble-other'}">
+        <div>${m.text}</div>
+        <div class="chat-time">${m.time}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.scrollTop = container.scrollHeight;
+}
+
+// Send Live Chat Message
+function handleSendChatMessage(e) {
+  e.preventDefault();
+  const input = document.getElementById("chat-input-text");
+  if (!input || !input.value.trim() || !AppState.activeChatTargetEmail) return;
+
+  const text = input.value.trim();
+  const myEmail = AppState.user.email.toLowerCase();
+  const friendEmail = AppState.activeChatTargetEmail.toLowerCase();
+  const chatKey = [myEmail, friendEmail].sort().join("___");
+
+  AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
+  if (!AppState.chats[chatKey]) AppState.chats[chatKey] = [];
+
+  const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  AppState.chats[chatKey].push({
+    sender: myEmail,
+    text: text,
+    time: timeStr
+  });
+
+  localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
+  input.value = "";
+  playAudioChime("success");
+  renderChatMessages();
+}
+
 // Web Audio API Sound Synthesizer
 function playAudioChime(type = "alarm") {
   try {
@@ -598,6 +749,21 @@ function openBadgeDetail(badgeId) {
   openModal("badge-detail-modal");
 }
 
+// Register user in global user registry
+function registerUserInMemory(userData) {
+  AppState.allUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  const existingIndex = AppState.allUsers.findIndex(u => u.email && u.email.toLowerCase() === userData.email.toLowerCase());
+  
+  if (existingIndex >= 0) {
+    AppState.allUsers[existingIndex] = { ...AppState.allUsers[existingIndex], ...userData };
+  } else {
+    AppState.allUsers.push(userData);
+  }
+
+  localStorage.setItem('edu_all_users', JSON.stringify(AppState.allUsers));
+  renderCommunityUsers();
+}
+
 // Check if user is already logged in via localStorage
 function checkPersistentAuth() {
   const savedSession = localStorage.getItem("edu_user_session");
@@ -607,6 +773,7 @@ function checkPersistentAuth() {
       Object.assign(AppState.user, userData);
       AppState.user.streak = 0; // Always start streak from 0
       AppState.isLoggedIn = true;
+      registerUserInMemory(userData);
     } catch (e) {
       localStorage.removeItem("edu_user_session");
     }
@@ -658,6 +825,7 @@ function updateAuthUI() {
 
   renderVideoStream();
   renderAchievementsGrid();
+  renderCommunityUsers();
 }
 
 // Launch Screen Progress
@@ -745,6 +913,7 @@ function handleSaveProfile(e) {
 
   if (AppState.isLoggedIn) {
     localStorage.setItem("edu_user_session", JSON.stringify(AppState.user));
+    registerUserInMemory(AppState.user);
   }
 
   updateAuthUI();
@@ -809,6 +978,7 @@ function saveUserSession(userData) {
   AppState.user.streak = 0;
   AppState.isLoggedIn = true;
   localStorage.setItem("edu_user_session", JSON.stringify(AppState.user));
+  registerUserInMemory(AppState.user);
   updateAuthUI();
 }
 
@@ -831,7 +1001,8 @@ function signOutUser() {
       aiCount: 0,
       quizzesPassed: 0,
       completedCourses: 0,
-      avatar: "assets/default_avatar.jpg"
+      avatar: "assets/default_avatar.jpg",
+      friends: []
     };
     updateAuthUI();
     openModal("auth-modal");
@@ -957,6 +1128,8 @@ function switchTab(tabName) {
   if (tabName === "videos") {
     renderVideoStream();
     renderUserCoursesGrid();
+  } else if (tabName === "profile") {
+    renderCommunityUsers();
   }
 
   document.querySelectorAll(".nav-item").forEach(item => {

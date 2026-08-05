@@ -248,6 +248,18 @@
           </div>
         </div>
 
+        <!-- 👥 Registered Students Directory, Friends & Live Chat -->
+        <div class="section-card">
+          <div class="section-card-title">
+            <span data-i18n="community_title">Student Directory & Friends</span>
+            <i class="ri-user-shared-line" style="color:var(--color-royal); font-size:20px;"></i>
+          </div>
+
+          <div id="community-users-list" style="display:flex; flex-direction:column; gap:10px;">
+            <!-- Dynamically Rendered via JS -->
+          </div>
+        </div>
+
         <!-- Study Tools Actions -->
         <div class="section-card">
           <div class="section-card-title">
@@ -298,6 +310,35 @@
         <span data-i18n="nav_profile">Profile</span>
       </div>
     </nav>
+
+    <!-- ================= 💬 REAL 1-ON-1 LIVE FRIENDS CHAT MODAL ================= -->
+    <div class="modal-overlay" id="chat-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <img id="chat-target-avatar" src="assets/default_avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--color-royal);">
+            <div>
+              <h4 id="chat-target-name" style="font-size:16px; font-weight:800; color:var(--text-primary);">Student Friend</h4>
+              <span id="chat-target-status" style="font-size:11px; color:var(--color-success); font-weight:600;">● Online</span>
+            </div>
+          </div>
+          <i class="ri-close-line" onclick="closeModal('chat-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages-box">
+            <!-- Messages populated live via JS -->
+          </div>
+
+          <form onsubmit="handleSendChatMessage(event)" style="display:flex; gap:8px; padding:10px; background:var(--bg-card); border-top:1px solid var(--border-subtle);">
+            <input type="text" id="chat-input-text" class="form-input" placeholder="Type a message..." required style="flex:1; border-radius:20px; padding:10px 16px;">
+            <button type="submit" class="circle-btn" style="background:var(--color-royal-gradient); color:#fff; border:none;" title="Send Message">
+              <i class="ri-send-plane-fill"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <!-- ================= 📚 REAL COURSE SYLLABUS & LESSON MODAL ================= -->
     <div class="modal-overlay" id="course-detail-modal">
