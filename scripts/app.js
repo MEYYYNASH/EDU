@@ -35,6 +35,7 @@ const translations = {
     achievements_title: "Achievements & Badges",
     community_title: "Student Directory & Friends",
     tools_title: "Study Tools & Platform Controls",
+    live_chat_btn: "Live Chat",
     pomo_btn: "Focus Timer",
     notes_btn: "Study Notes",
     admin_btn: "Educator Admin",
@@ -44,7 +45,8 @@ const translations = {
     nav_video: "Video",
     nav_note: "Note",
     nav_notif: "Notification",
-    nav_profile: "Profile"
+    nav_profile: "Profile",
+    chat_select_title: "Select Friend to Chat"
   },
   km: {
     tagline: "រៀន។ អនុវត្ត។ រក្សាការរីកចម្រើន។",
@@ -71,6 +73,7 @@ const translations = {
     achievements_title: "សមិទ្ធផល និងបេកប្តូរ",
     community_title: "សហគមន៍សិស្ស និងមិត្តភក្តិ",
     tools_title: "ឧបករណ៍សិក្សា និងការគ្រប់គ្រង",
+    live_chat_btn: "ឆាតផ្ទាល់",
     pomo_btn: "នាឡិកាផ្តោតអារម្មណ៍",
     notes_btn: "កំណត់ត្រាសិក្សា",
     admin_btn: "អ្នកគ្រប់គ្រង",
@@ -80,7 +83,8 @@ const translations = {
     nav_video: "វីដេអូ",
     nav_note: "កំណត់ត្រា",
     nav_notif: "ដំណឹង",
-    nav_profile: "ប្រវត្តិរូប"
+    nav_profile: "ប្រវត្តិរូប",
+    chat_select_title: "ជ្រើសរើសមិត្តភក្តិដើម្បីឆាត"
   }
 };
 
@@ -257,6 +261,37 @@ function openAdminModal() {
     return;
   }
   openModal("admin-modal");
+}
+
+// Open Quick Chat Selector Modal
+function openChatSelectorModal() {
+  const container = document.getElementById("chat-select-list");
+  if (!container) return;
+
+  AppState.allUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  const isKm = AppState.lang === 'km';
+  const currentUserEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
+
+  const otherStudents = AppState.allUsers.filter(u => u.email && u.email.toLowerCase() !== currentUserEmail);
+
+  if (otherStudents.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">${isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។' : 'No other students registered yet.'}</div>`;
+  } else {
+    container.innerHTML = otherStudents.map(u => `
+      <div class="item-row" onclick="closeModal('chat-select-modal'); openChatModal('${u.email}')" style="border:1px solid var(--border-subtle); padding:10px 14px; border-radius:16px; cursor:pointer;">
+        <img src="${u.avatar || 'assets/default_avatar.jpg'}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--color-royal);">
+        <div class="item-info">
+          <div class="item-title">${u.name}</div>
+          <div class="item-subtitle">${u.school || 'Student'} • @${u.username || 'user'}</div>
+        </div>
+        <button class="btn-primary" style="width:auto; padding:6px 14px; font-size:12px;">
+          <i class="ri-chat-3-line"></i> ${isKm ? 'ឆាត' : 'Chat'}
+        </button>
+      </div>
+    `).join('');
+  }
+
+  openModal("chat-select-modal");
 }
 
 // Render Real Courses Grid

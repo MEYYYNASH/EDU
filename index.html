@@ -52,6 +52,9 @@
         <div class="circle-btn" id="theme-toggle-btn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">
           <i class="ri-moon-line"></i>
         </div>
+        <div class="circle-btn" onclick="openChatSelectorModal()" title="Live Chat with Friends">
+          <i class="ri-chat-3-line" style="color:var(--color-royal);"></i>
+        </div>
         <div class="circle-btn" onclick="openModal('ai-modal')" title="Search / AI">
           <i class="ri-search-line"></i>
         </div>
@@ -266,6 +269,7 @@
           </div>
 
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button class="btn-secondary" onclick="openChatSelectorModal()"><i class="ri-chat-3-line" style="color:var(--color-royal);"></i> <span data-i18n="live_chat_btn">Live Chat</span></button>
             <button class="btn-secondary" onclick="openModal('pomo-modal')"><i class="ri-timer-line" style="color:var(--color-royal);"></i> <span data-i18n="pomo_btn">Focus Timer</span></button>
             <button class="btn-secondary" onclick="openModal('notes-modal')"><i class="ri-file-text-line" style="color:var(--color-gold);"></i> <span data-i18n="notes_btn">Study Notes</span></button>
             <button class="btn-secondary" id="admin-control-btn" onclick="openAdminModal()" style="display:none;"><i class="ri-dashboard-line" style="color:var(--color-royal);"></i> <span data-i18n="admin_btn">Educator Admin</span></button>
@@ -309,6 +313,23 @@
         <span data-i18n="nav_profile">Profile</span>
       </div>
     </nav>
+
+    <!-- ================= 💬 REAL 1-ON-1 LIVE FRIENDS CHAT SELECTOR MODAL ================= -->
+    <div class="modal-overlay" id="chat-select-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i class="ri-chat-3-line" style="font-size:22px; color:var(--color-royal);"></i>
+            <h3 style="font-size:18px; font-weight:800;" data-i18n="chat_select_title">Select Friend to Chat</h3>
+          </div>
+          <i class="ri-close-line" onclick="closeModal('chat-select-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+
+        <div id="chat-select-list" style="display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto;">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </div>
 
     <!-- ================= 💬 REAL 1-ON-1 LIVE FRIENDS CHAT MODAL ================= -->
     <div class="modal-overlay" id="chat-modal">
