@@ -845,10 +845,6 @@ function initLaunchScreen() {
           screen.style.opacity = "0";
           setTimeout(() => screen.style.visibility = "hidden", 400);
         }
-        
-        if (!AppState.isLoggedIn) {
-          openModal("auth-modal");
-        }
       }, 200);
     }
   }, 80);
