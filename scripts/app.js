@@ -1460,6 +1460,14 @@ function setupEventListeners() {
     item.addEventListener("click", () => switchTab(item.getAttribute("data-tab")));
   });
 
+  document.querySelectorAll(".modal-overlay").forEach(overlay => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove("active");
+      }
+    });
+  });
+
   renderNotes();
   updatePomodoroUI();
 }

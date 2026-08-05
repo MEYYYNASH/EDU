@@ -633,10 +633,16 @@
     <!-- Telegram Modal -->
     <div class="modal-overlay" id="tg-modal">
       <div class="modal-card" style="text-align:center;">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:6px;">
+          <i class="ri-close-line" onclick="closeModal('tg-modal')" style="font-size:26px; cursor:pointer; color:var(--text-secondary);"></i>
+        </div>
         <i class="ri-telegram-fill" style="font-size:48px; color:#0088cc;"></i>
         <h3 style="font-size:18px; margin-top:6px;">Edu STUDENT Telegram Bot</h3>
         <p style="font-size:12px; color:var(--text-muted); margin:10px 0;" data-i18n="tg_desc">Connect with our Telegram Video Bot for instant updates and video stream alerts.</p>
-        <a href="https://t.me/STUVideoBOT" target="_blank" class="btn-primary" style="text-decoration:none;" data-i18n="open_tg_btn">Open @STUVideoBOT</a>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+          <a href="https://t.me/STUVideoBOT" target="_blank" class="btn-primary" style="text-decoration:none;" data-i18n="open_tg_btn">Open @STUVideoBOT</a>
+          <button type="button" class="btn-secondary" onclick="closeModal('tg-modal')">Cancel</button>
+        </div>
       </div>
     </div>
 
