@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edu STUDENT | Study Notes & Reminders Vault</title>
+  <meta name="description" content="View and manage all your old and new study notes with time reminders.">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles/main.css">
+  <style>
+    body {
+      overflow-y: auto !important;
+      background-color: var(--bg-app);
+    }
+    .notes-page-container {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 20px 80px 20px;
+    }
+    .notes-header-card {
+      background: var(--color-royal-gradient);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-royal);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="notes-page-container">
+    
+    <!-- Notes Header -->
+    <div class="notes-header-card">
+      <div>
+        <h2 style="font-size:22px; font-weight:800;">My Study Notes Vault</h2>
+        <p style="font-size:13px; opacity:0.9; margin-top:2px;">View all saved notes, lecture summaries & scheduled time reminders.</p>
+      </div>
+      <a href="index.html" class="arrow-circle-btn" style="text-decoration:none;" title="Back to Main App">
+        <i class="ri-home-5-line"></i>
+      </a>
+    </div>
+
+    <!-- Search & New Note Action Bar -->
+    <div class="section-card" style="margin-bottom:20px;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:200px;">
+          <input type="text" id="notes-search-input" class="form-input" placeholder="🔍 Search old study notes by title or content..." oninput="renderNotesList()">
+        </div>
+        <button class="btn-primary" onclick="openCreateNoteModalPage()" style="width:auto; padding:0 20px;">
+          <i class="ri-add-line"></i> Create New Note
+        </button>
+      </div>
+    </div>
+
+    <!-- Notes List Container -->
+    <div id="notes-vault-container">
+      <!-- Dynamically populated -->
+    </div>
+
+  </div>
+
+  <!-- Create Note Modal for notes.html -->
+  <div class="modal-overlay" id="create-note-modal">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <h3 style="font-size:18px; font-weight:700;">Create Note & Set Reminder</h3>
+        <i class="ri-close-line" onclick="closeModal('create-note-modal')" style="font-size:26px; cursor:pointer;"></i>
+      </div>
+
+      <form onsubmit="handleSaveNewNotePage(event)">
+        <div class="form-group">
+          <label class="form-label" style="font-weight:600;">Note Title</label>
+          <input type="text" id="new-note-title" class="form-input" placeholder="e.g. Neural Network Backpropagation" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-weight:600;">Note Content</label>
+          <textarea id="new-note-content" class="form-input" rows="4" placeholder="Write down lecture points..." required style="resize:none;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i class="ri-alarm-line" style="color:var(--color-gold);"></i> Set Reminder Date & Time
+          </label>
+          <input type="datetime-local" id="new-note-reminder" class="form-input">
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button type="submit" class="btn-primary" style="flex:1;"><i class="ri-save-line"></i> Save Study Note</button>
+          <button type="button" class="btn-secondary" onclick="closeModal('create-note-modal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let savedNotes = JSON.parse(localStorage.getItem('edu_user_notes')) || [
+      { id: 1, title: "Quantum Computing Qubits", content: "Superposition allows qubits to exist in multiple states simultaneously.", date: "2026-08-04", reminderTime: null, notified: false },
+      { id: 2, title: "Neural Network Backpropagation", content: "Chain rule applied to calculate error gradients layer by layer.", date: "2026-08-03", reminderTime: null, notified: false }
+    ];
+
+    function renderNotesList() {
+      const container = document.getElementById("notes-vault-container");
+      const searchVal = document.getElementById("notes-search-input").value.toLowerCase();
+      if (!container) return;
+
+      const filtered = savedNotes.filter(n => 
+        n.title.toLowerCase().includes(searchVal) || n.content.toLowerCase().includes(searchVal)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="section-card" style="text-align:center; padding:30px; color:var(--text-muted);">No study notes found. Click "Create New Note" to add one!</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(n => {
+        const formattedRem = n.reminderTime ? new Date(n.reminderTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : null;
+        return `
+          <div class="section-card" style="margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <i class="ri-sticky-note-fill" style="color:var(--color-royal); font-size:22px;"></i>
+                <h3 style="font-size:16px; font-weight:700; color:var(--text-primary);">${n.title}</h3>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:12px; color:var(--text-muted); font-weight:500;">${n.date}</span>
+                <i class="ri-delete-bin-line" onclick="deleteNotePage(${n.id})" style="color:var(--color-danger); cursor:pointer; font-size:18px;" title="Delete Note"></i>
+              </div>
+            </div>
+            <p style="font-size:14px; color:var(--text-secondary); line-height:1.6; white-space:pre-wrap;">${n.content}</p>
+
+            ${formattedRem ? `
+              <div style="margin-top:12px; display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:6px 12px; border-radius:10px; background:${n.notified ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'}; color:${n.notified ? 'var(--color-success)' : 'var(--color-gold)'}; font-weight:600;">
+                <i class="${n.notified ? 'ri-checkbox-circle-fill' : 'ri-alarm-line'}"></i>
+                <span>${n.notified ? 'Notification Sent at' : 'Scheduled Reminder:'} ${formattedRem}</span>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openCreateNoteModalPage() {
+      document.getElementById("create-note-modal").classList.add("active");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("active");
+    }
+
+    function handleSaveNewNotePage(e) {
+      e.preventDefault();
+      const title = document.getElementById("new-note-title").value.trim();
+      const content = document.getElementById("new-note-content").value.trim();
+      const reminderTime = document.getElementById("new-note-reminder").value;
+
+      savedNotes.unshift({
+        id: Date.now(),
+        title,
+        content,
+        reminderTime: reminderTime || null,
+        notified: false,
+        date: new Date().toISOString().split('T')[0]
+      });
+
+      localStorage.setItem('edu_user_notes', JSON.stringify(savedNotes));
+      renderNotesList();
+      closeModal("create-note-modal");
+    }
+
+    function deleteNotePage(id) {
+      if (confirm("Delete this study note?")) {
+        savedNotes = savedNotes.filter(n => n.id !== id);
+        localStorage.setItem('edu_user_notes', JSON.stringify(savedNotes));
+        renderNotesList();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", renderNotesList);
+  </script>
+</body>
+</html>

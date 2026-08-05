@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Edu STUDENT | Learn. Practice. Grow.</title>
+  <meta name="description" content="Edu STUDENT - Modern Full Screen Mobile Learning & Work Management Platform.">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4f58f6">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <div class="app-viewport" id="app-viewport">
+    
+    <!-- 🚀 Launch Screen -->
+    <div id="launch-screen">
+      <div class="launch-logo-box">
+        <i class="ri-pulse-line"></i>
+      </div>
+      <h2 style="margin-top: 16px; font-weight: 800; letter-spacing: -0.5px; color: #181925;">Edu STUDENT</h2>
+      <p style="font-size: 14px; color: #676b7c; margin-top: 4px;" data-i18n="tagline">Learn. Practice. Grow.</p>
+      <div class="loading-bar-container">
+        <div class="loading-bar-fill" id="launch-fill"></div>
+      </div>
+    </div>
+
+    <!-- 📱 App Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon-box">
+          <i class="ri-pulse-line"></i>
+        </div>
+        <div>
+          <h3 style="font-size: 20px; font-weight: 800; line-height: 1.1; color: var(--text-primary);">Edu STUDENT</h3>
+          <span style="font-size: 13px; color: var(--text-secondary);" data-i18n="header_sub">learn management</span>
+        </div>
+      </div>
+
+      <div class="header-icons">
+        <button class="lang-switch-btn" onclick="toggleLanguage()" id="lang-btn" title="Switch Language">
+          🌐 <span>ខ្មែរ</span>
+        </button>
+        <div class="circle-btn" id="theme-toggle-btn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">
+          <i class="ri-moon-line"></i>
+        </div>
+        <div class="circle-btn" onclick="openModal('ai-modal')" title="Search / AI">
+          <i class="ri-search-line"></i>
+        </div>
+        <div class="circle-btn" id="header-account-btn" title="Account">
+          <i class="ri-user-add-line"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- 📂 Main Views Container -->
+    <main class="app-content">
+
+      <!-- ================= 🏠 HOME TAB ================= -->
+      <section id="tab-home" class="tab-pane">
+        
+        <div class="grid-2col">
+          <!-- Royal Blue Favorites Banner Card -->
+          <div class="hero-favorite-card">
+            <div class="hero-header">
+              <h3 style="font-size: 20px; font-weight: 700;" data-i18n="my_favorites">My favorites</h3>
+              <button class="arrow-circle-btn" onclick="nextFavorite()" title="Next Favorite">
+                <i class="ri-arrow-right-line"></i>
+              </button>
+            </div>
+
+            <div class="inner-preview-card" id="fav-preview-container" onclick="switchTab('videos')"></div>
+            <div class="pagination-dots" id="fav-dots-container"></div>
+          </div>
+
+          <!-- Recently Visited Card Container -->
+          <div class="section-card">
+            <div class="section-card-title">
+              <span data-i18n="recently_visited">Recently visited</span>
+              <button class="arrow-circle-btn-sm" onclick="switchTab('videos')" title="View All">
+                <i class="ri-arrow-right-line"></i>
+              </button>
+            </div>
+
+            <div id="recent-list-container"></div>
+          </div>
+        </div>
+
+        <!-- Workspaces & Subjects Section Grid (Mathematics Only) -->
+        <div class="section-card">
+          <div class="section-card-title">
+            <span data-i18n="subject_workspace">Subject Workspace</span>
+            <button class="arrow-circle-btn-sm" onclick="switchTab('videos')">
+              <i class="ri-arrow-right-line"></i>
+            </button>
+          </div>
+
+          <div style="display:flex; justify-content:center;">
+            <div class="btn-secondary" style="padding:20px; flex-direction:column; align-items:center; text-align:center; width:100%; max-width:340px; height:auto; border:2px solid var(--color-royal);" onclick="switchTab('videos')">
+              <i class="ri-calculator-line" style="font-size:36px; color:var(--color-royal);"></i>
+              <strong style="font-size:17px; margin-top:10px; color:var(--text-primary);" data-i18n="math_title">Mathematics</strong>
+              <small style="color:var(--text-secondary); margin-top:4px;" data-i18n="math_subtitle">Advanced Algebra, Calculus & Geometry Lessons</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <!-- Daily Learning Challenge Card -->
+          <div class="section-card" style="border-left: 5px solid var(--color-royal);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span style="font-size:11px; font-weight:700; color:var(--color-royal);" data-i18n="daily_challenge_label">DAILY CHALLENGE</span>
+                <h4 style="font-size:15px; font-weight:700; margin-top:2px;" data-i18n="daily_challenge_title">Complete Active Recall Quiz</h4>
+                <p style="font-size:12px; color:var(--text-secondary); margin-top:4px;" data-i18n="daily_challenge_desc">Earn +150 XP & increase your study streak!</p>
+              </div>
+              <button class="btn-primary" onclick="openQuizModal()" style="width:auto; padding:10px 16px; font-size:13px;" data-i18n="start_btn">Start</button>
+            </div>
+          </div>
+
+          <!-- Real Student Leaderboard Ranking Card -->
+          <div class="section-card">
+            <div class="section-card-title">
+              <span data-i18n="leaderboard_title">Top Student Leaderboard</span>
+              <i class="ri-trophy-line" style="color:var(--color-gold); font-size:20px;"></i>
+            </div>
+
+            <div class="item-row" style="padding:8px 0; border:none;">
+              <div style="font-weight:800; color:var(--color-gold); width:20px;">1</div>
+              <img id="leaderboard-user-img" src="assets/default_avatar.jpg" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+              <div class="item-info">
+                <div class="item-title" id="leaderboard-user-name">Student User</div>
+                <div class="item-subtitle" id="leaderboard-user-xp">0 XP • Level 1</div>
+              </div>
+              <span style="font-size:12px; font-weight:700; color:var(--color-gold); display:flex; align-items:center; gap:4px;">
+                <i class="ri-medal-fill" style="color:#f59e0b;"></i> 1st Rank
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= 🎬 VIDEO TAB ================= -->
+      <section id="tab-videos" class="tab-pane" style="display:none;">
+        
+        <div class="section-card">
+          <div class="section-card-title">
+            <span data-i18n="video_stream_title">Mathematics Video Stream</span>
+            <i class="ri-film-line" style="color:var(--color-royal); font-size:20px;"></i>
+          </div>
+
+          <!-- Dynamic Video Stream Grid (Managed live by Admin) -->
+          <div class="grid-2col" id="video-stream-grid">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Real Dynamic Courses Progress Grid -->
+        <div class="section-card">
+          <div class="section-card-title">
+            <span data-i18n="my_courses_title">My Mathematics Courses</span>
+            <i class="ri-calculator-line" style="color:var(--color-royal); font-size:20px;"></i>
+          </div>
+
+          <div class="grid-2col" id="user-courses-grid">
+            <!-- Dynamically Populated via JS -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= 🔔 NOTIFICATION TAB ================= -->
+      <section id="tab-notifications" class="tab-pane" style="display:none;">
+        
+        <div class="section-card">
+          <div class="section-card-title">
+            <span data-i18n="notifications_title">Notifications Feed</span>
+            <i class="ri-notification-3-line" style="color:var(--color-royal); font-size:20px;"></i>
+          </div>
+
+          <div class="item-row" style="border:none;">
+            <div class="item-icon-box" style="color:var(--color-royal);">
+              <i class="ri-pulse-line"></i>
+            </div>
+            <div class="item-info">
+              <div class="item-title" data-i18n="notif_1_title">Welcome to Edu STUDENT Platform</div>
+              <div class="item-subtitle" data-i18n="notif_1_sub">Start exploring lessons and creating your study notes.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-card-title">
+            <span data-i18n="pending_assignments_title">Pending Assignments</span>
+            <i class="ri-task-line" style="color:var(--color-gold); font-size:20px;"></i>
+          </div>
+
+          <div style="text-align:center; padding:16px 0; color:var(--text-muted); font-size:13.5px;" data-i18n="no_assignments">
+            No pending assignments.
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= 💬 MORE / PROFILE TAB ================= -->
+      <section id="tab-profile" class="tab-pane" style="display:none;">
+        
+        <div class="grid-2col">
+          <!-- Account Card -->
+          <div class="section-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px;">
+              <div style="display:flex; gap:16px; align-items:center;">
+                <img id="profile-display-avatar" src="assets/default_avatar.jpg" style="width:64px; height:64px; border-radius:50%; object-fit:cover; border:3px solid var(--color-royal);">
+                <div>
+                  <h3 style="font-size:18px; font-weight:700;" id="profile-display-name">Student User</h3>
+                  <p style="font-size:13px; color:var(--color-royal);" id="profile-display-email">student@edustudent.io</p>
+                  <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;" id="profile-display-school">Global Learning Institute</div>
+                  <span style="font-size:11px; color:var(--text-muted);" id="card-student-id">EDU-2026-8842</span>
+                </div>
+              </div>
+
+              <button class="arrow-circle-btn-sm" onclick="openEditProfileModal()" title="Edit Account Card">
+                <i class="ri-pencil-line"></i>
+              </button>
+            </div>
+
+            <button class="btn-primary" onclick="openEditProfileModal()"><i class="ri-edit-box-line"></i> <span data-i18n="edit_profile_btn">Edit Profile & Change Photo</span></button>
+          </div>
+
+          <!-- Real Interactive Badges & Achievements Grid -->
+          <div class="section-card">
+            <div class="section-card-title">
+              <span data-i18n="achievements_title">Achievements & Badges</span>
+              <i class="ri-medal-line" style="color:var(--color-gold); font-size:20px;"></i>
+            </div>
+
+            <div class="badge-grid" id="achievements-badge-grid">
+              <!-- Dynamically Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Study Tools Actions -->
+        <div class="section-card">
+          <div class="section-card-title">
+            <span data-i18n="tools_title">Study Tools & Platform Controls</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button class="btn-secondary" onclick="openModal('pomo-modal')"><i class="ri-timer-line" style="color:var(--color-royal);"></i> <span data-i18n="pomo_btn">Focus Timer</span></button>
+            <button class="btn-secondary" onclick="openModal('notes-modal')"><i class="ri-file-text-line" style="color:var(--color-gold);"></i> <span data-i18n="notes_btn">Study Notes</span></button>
+            <button class="btn-secondary" id="admin-control-btn" onclick="openAdminModal()" style="display:none;"><i class="ri-dashboard-line" style="color:var(--color-royal);"></i> <span data-i18n="admin_btn">Educator Admin</span></button>
+            <button class="btn-secondary" onclick="openModal('tg-modal')"><i class="ri-telegram-line" style="color:#0088cc;"></i> <span data-i18n="tg_btn">Telegram Bot</span></button>
+          </div>
+
+          <button class="btn-secondary" onclick="signOutUser()" style="width:100%; margin-top:12px; color:var(--color-danger); border-color:rgba(239,68,68,0.2);">
+            <i class="ri-logout-box-r-line"></i> <span data-i18n="signout_btn">Sign Out</span>
+          </button>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ➕ Floating Action Plus Button -->
+    <button class="fab-btn" onclick="openCreateNoteModal()" title="Create New Study Note & Reminder">
+      <i class="ri-add-line"></i>
+    </button>
+
+    <!-- 📱 Floating Dark Pill Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <div class="nav-item active" data-tab="home" title="Home">
+        <i class="ri-home-5-fill"></i>
+        <span data-i18n="nav_home">Home</span>
+      </div>
+      <div class="nav-item" data-tab="videos" title="Video">
+        <i class="ri-planet-line"></i>
+        <span data-i18n="nav_video">Video</span>
+      </div>
+      <div class="nav-item" onclick="openCreateNoteModal()" title="Add Note">
+        <i class="ri-add-box-line"></i>
+        <span data-i18n="nav_note">Note</span>
+      </div>
+      <div class="nav-item" data-tab="notifications" title="Notifications">
+        <i class="ri-grid-fill"></i>
+        <span data-i18n="nav_notif">Notification</span>
+      </div>
+      <div class="nav-item" data-tab="profile" title="Profile">
+        <i class="ri-user-3-line"></i>
+        <span data-i18n="nav_profile">Profile</span>
+      </div>
+    </nav>
+
+    <!-- ================= 📚 REAL COURSE SYLLABUS & LESSON MODAL ================= -->
+    <div class="modal-overlay" id="course-detail-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 id="course-modal-title" style="font-size:18px; font-weight:800;">Course Title</h3>
+          <i class="ri-close-line" onclick="closeModal('course-detail-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+        
+        <p id="course-modal-workspace" style="font-size:13px; color:var(--color-royal); font-weight:600; margin-bottom:10px;"></p>
+        <div class="progress-bar-bg" style="margin-bottom:16px;">
+          <div class="progress-bar-fill" id="course-modal-progress-bar"></div>
+        </div>
+
+        <h4 style="font-size:14px; font-weight:700; margin-bottom:10px;" data-i18n="syllabus_header">Interactive Lesson Syllabus:</h4>
+        <div id="course-lessons-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- ================= 🏆 REAL BADGE DETAIL MODAL ================= -->
+    <div class="modal-overlay" id="badge-detail-modal">
+      <div class="modal-card" style="text-align:center;">
+        <div style="display:flex; justify-content:flex-end;">
+          <i class="ri-close-line" onclick="closeModal('badge-detail-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+        
+        <div id="badge-detail-icon-box" style="margin:10px auto 14px auto; width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:36px;"></div>
+        <h3 id="badge-detail-title" style="font-size:20px; font-weight:800;">Badge Title</h3>
+        <p id="badge-detail-desc" style="font-size:13px; color:var(--text-secondary); margin:6px 0 16px 0;"></p>
+        
+        <div style="background:var(--bg-card-secondary); padding:14px; border-radius:16px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:6px;">
+            <span data-i18n="unlock_progress">Unlock Progress</span>
+            <span id="badge-detail-progress-text">0 / 0</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="badge-detail-progress-bar"></div>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="closeModal('badge-detail-modal')" data-i18n="close_btn">Close Badge View</button>
+      </div>
+    </div>
+
+    <!-- ================= ✍️ CREATE STUDY NOTE & TIME REMINDER MODAL ================= -->
+    <div class="modal-overlay" id="create-note-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:38px; height:38px; border-radius:12px; background:rgba(79,88,246,0.1); color:var(--color-royal); display:flex; align-items:center; justify-content:center; font-size:20px;">
+              <i class="ri-edit-box-line"></i>
+            </div>
+            <h3 style="font-size:18px; font-weight:700;" data-i18n="create_note_header">Create Note & Reminder</h3>
+          </div>
+          <i class="ri-close-line" onclick="closeModal('create-note-modal')" style="font-size:26px; cursor:pointer; color:var(--text-secondary);"></i>
+        </div>
+
+        <form onsubmit="handleSaveNewNote(event)">
+          <div class="form-group">
+            <label class="form-label" style="font-weight:600; color:var(--text-primary);" data-i18n="note_title_label">Note Title</label>
+            <input type="text" id="new-note-title" class="form-input" placeholder="e.g. Integral Calculus Substitution" required style="font-size:15px; font-weight:600;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="font-weight:600; color:var(--text-primary);" data-i18n="note_content_label">Note Content</label>
+            <textarea id="new-note-content" class="form-input" rows="4" placeholder="Write down your math formulas, key solutions, or study points..." required style="resize:none; line-height:1.6;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+              <i class="ri-alarm-line" style="color:var(--color-gold);"></i> <span data-i18n="note_reminder_label">Set Time Reminder (Sends Web Notification)</span>
+            </label>
+            <input type="datetime-local" id="new-note-reminder" class="form-input">
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <button type="submit" class="btn-primary" style="flex:1;">
+              <i class="ri-save-line"></i> <span data-i18n="save_note_btn">Save Note & Schedule Reminder</span>
+            </button>
+            <button type="button" class="btn-secondary" onclick="closeModal('create-note-modal')" data-i18n="cancel_btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= EDIT PROFILE MODAL ================= -->
+    <div class="modal-overlay" id="edit-profile-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <h3 style="font-size:20px;" data-i18n="edit_profile_header">Edit Profile & Photo</h3>
+          <i class="ri-close-line" onclick="closeModal('edit-profile-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+
+        <form onsubmit="handleSaveProfile(event)">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:20px;">
+            <img id="edit-avatar-preview" src="assets/default_avatar.jpg" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--color-royal); box-shadow:0 6px 16px rgba(0,0,0,0.1);">
+            <input type="file" id="edit-avatar-file" accept="image/*" style="display:none;" onchange="handleAvatarFileSelect(event)">
+            <button type="button" class="btn-secondary" style="font-size:12px; padding:6px 14px;" onclick="document.getElementById('edit-avatar-file').click()">
+              <i class="ri-upload-2-line"></i> <span data-i18n="upload_photo_btn">Upload New Profile Photo</span>
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="fullname_label">Full Name</label>
+            <input type="text" id="edit-name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="username_label">Username</label>
+            <input type="text" id="edit-username" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="studentid_label">Student ID</label>
+            <input type="text" id="edit-id" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="school_label">School / Institute</label>
+            <input type="text" id="edit-school" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="email_label">Email Address</label>
+            <input type="email" id="edit-email" class="form-input" required>
+          </div>
+
+          <button type="submit" class="btn-primary" style="margin-top:10px;" data-i18n="save_profile_btn">Save Profile & Photo</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= AUTHENTICATION MODAL ================= -->
+    <div class="modal-overlay" id="auth-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <div style="display:flex; gap:16px;">
+            <span id="tab-btn-signin" onclick="toggleAuthMode('signin')" style="font-size:18px; font-weight:700; color:var(--color-royal); border-bottom:2px solid var(--color-royal); cursor:pointer; padding-bottom:4px;" data-i18n="signin_tab">Sign In</span>
+            <span id="tab-btn-signup" onclick="toggleAuthMode('signup')" style="font-size:18px; font-weight:700; color:var(--text-secondary); cursor:pointer; padding-bottom:4px;" data-i18n="signup_tab">Create Account</span>
+          </div>
+          <i class="ri-close-line" onclick="closeModal('auth-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+
+        <div id="auth-signin-box">
+          <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label class="form-label" data-i18n="email_label">Email Address</label>
+              <input type="email" id="login-email" class="form-input" placeholder="student@edustudent.io" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="password_label">Password</label>
+              <input type="password" id="login-pass" class="form-input" placeholder="••••••••" required>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:14px;">
+              <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
+                <input type="checkbox" checked> <span data-i18n="remember_me">Remember Me</span>
+              </label>
+              <a href="#" style="color:var(--color-royal);" data-i18n="forgot_pass">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-bottom:14px;" data-i18n="signin_btn">Sign In</button>
+          </form>
+
+          <div style="text-align:center; font-size:12px; color:var(--text-muted); margin:12px 0;" data-i18n="or_continue">OR CONTINUE WITH</div>
+
+          <div style="display:flex; gap:10px;">
+            <button class="btn-secondary" onclick="handleSocialLogin('google')" style="flex:1;">
+              <i class="ri-google-fill" style="color:#ea4335;"></i> Google
+            </button>
+            <button class="btn-secondary" onclick="handleSocialLogin('github')" style="flex:1;">
+              <i class="ri-github-fill"></i> GitHub
+            </button>
+          </div>
+        </div>
+
+        <div id="auth-signup-box" style="display:none;">
+          <form onsubmit="handleSignUp(event)">
+            <div class="form-group">
+              <label class="form-label" data-i18n="fullname_label">Full Name</label>
+              <input type="text" id="signup-name" class="form-input" placeholder="e.g. Student User" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="username_label">Username</label>
+              <input type="text" id="signup-username" class="form-input" placeholder="e.g. student_user" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="email_label">Email Address</label>
+              <input type="email" id="signup-email" class="form-input" placeholder="student@edustudent.io" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="password_label">Password</label>
+              <input type="password" id="signup-pass" class="form-input" placeholder="At least 6 characters" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="confirm_pass_label">Confirm Password</label>
+              <input type="password" id="signup-pass-confirm" class="form-input" placeholder="Re-enter password" required>
+            </div>
+            <div style="margin-bottom:14px; font-size:12px;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="checkbox" required> <span data-i18n="terms_label">I accept the Terms & Conditions</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-bottom:14px;" data-i18n="create_acc_btn">Create Account</button>
+          </form>
+
+          <div style="display:flex; gap:10px;">
+            <button class="btn-secondary" onclick="handleSocialLogin('google')" style="flex:1;">
+              <i class="ri-google-fill" style="color:#ea4335;"></i> Google
+            </button>
+            <button class="btn-secondary" onclick="handleSocialLogin('github')" style="flex:1;">
+              <i class="ri-github-fill"></i> GitHub
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AI Assistant Modal -->
+    <div class="modal-overlay" id="ai-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:20px; color:var(--color-royal);"><i class="ri-sparkles-line"></i> <span data-i18n="ai_assistant_title">AI Math Assistant</span></h3>
+          <i class="ri-close-line" onclick="closeModal('ai-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+
+        <div class="form-group">
+          <input type="text" id="ai-input" class="form-input" placeholder="Ask AI: Solve derivative of x^2 * sin(x) or explain matrix multiplication...">
+        </div>
+        <button class="btn-primary" onclick="handleAIPrompt()" data-i18n="ask_ai_btn">Ask AI Math Assistant</button>
+        <div id="ai-output" style="margin-top:14px;"></div>
+      </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div class="modal-overlay" id="video-player-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h4 id="video-title" style="font-size:16px;">Lesson Video</h4>
+          <i class="ri-close-line" onclick="closeModal('video-player-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+        <video id="main-video-el" controls style="width:100%; border-radius:16px; background:#000; height:220px;"></video>
+        <p id="video-teacher" style="font-size:13px; color:var(--text-secondary); margin-top:8px;"></p>
+        <div style="display:flex; justify-content:space-between; margin-top:12px;">
+          <select class="form-input" style="width:auto; padding:6px 10px; font-size:13px;" onchange="setPlaybackSpeed(this.value)">
+            <option value="1.0">1.0x Speed</option>
+            <option value="1.5">1.5x Speed</option>
+            <option value="2.0">2.0x Speed</option>
+          </select>
+          <button class="btn-secondary" onclick="togglePiP()" style="font-size:13px; padding:6px 14px;">PiP Mode</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div class="modal-overlay" id="quiz-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:18px; color:var(--color-royal);" data-i18n="quiz_title">Practice Quiz</h3>
+          <i class="ri-close-line" onclick="closeModal('quiz-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+        <p id="quiz-q" style="font-size:15px; font-weight:600; margin-bottom:14px;"></p>
+        <div id="quiz-options"></div>
+      </div>
+    </div>
+
+    <!-- Pomodoro Focus Timer Modal -->
+    <div class="modal-overlay" id="pomo-modal">
+      <div class="modal-card" style="text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <h3 style="font-size:18px;" data-i18n="pomo_header">Study Focus Timer</h3>
+          <i class="ri-close-line" onclick="closeModal('pomo-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+        <div id="pomo-display" style="font-size:52px; font-weight:800; color:var(--color-royal); margin:24px 0;">25:00</div>
+        <button class="btn-primary" id="pomo-btn" onclick="togglePomodoro()" data-i18n="start_focus">▶ Start Focus</button>
+      </div>
+    </div>
+
+    <!-- Notes View Modal -->
+    <div class="modal-overlay" id="notes-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <i class="ri-file-text-line" style="font-size:22px; color:var(--color-royal);"></i>
+            <h3 style="font-size:18px; font-weight:700;" data-i18n="notes_modal_header">Study Notes & Scheduled Reminders</h3>
+          </div>
+          <i class="ri-close-line" onclick="closeModal('notes-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+        <button class="btn-primary" onclick="openCreateNoteModal()" style="margin-bottom:16px;">
+          <i class="ri-add-line"></i> <span data-i18n="create_note_btn">Create Note & Set Reminder</span>
+        </button>
+        <div id="notes-container"></div>
+      </div>
+    </div>
+
+    <!-- Telegram Modal -->
+    <div class="modal-overlay" id="tg-modal">
+      <div class="modal-card" style="text-align:center;">
+        <i class="ri-telegram-fill" style="font-size:48px; color:#0088cc;"></i>
+        <h3 style="font-size:18px; margin-top:6px;">Edu STUDENT Telegram Bot</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin:10px 0;" data-i18n="tg_desc">Connect with our Telegram Video Bot for instant updates and video stream alerts.</p>
+        <a href="https://t.me/STUVideoBOT" target="_blank" class="btn-primary" style="text-decoration:none;" data-i18n="open_tg_btn">Open @STUVideoBOT</a>
+      </div>
+    </div>
+
+    <!-- Super Educator Admin Modal -->
+    <div class="modal-overlay" id="admin-modal">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i class="ri-shield-user-fill" style="font-size:24px; color:var(--color-royal);"></i>
+            <h3 style="font-size:18px; color:var(--color-royal);">Educator Admin Panel</h3>
+          </div>
+          <i class="ri-close-line" onclick="closeModal('admin-modal')" style="font-size:26px; cursor:pointer;"></i>
+        </div>
+
+        <div style="background:var(--bg-card-secondary); padding:14px; border-radius:18px; margin-bottom:16px; border:1px solid var(--border-subtle);">
+          <div style="font-size:11px; font-weight:700; color:var(--color-royal); text-transform:uppercase;">Super Admin Mode Active</div>
+          <small style="color:var(--text-secondary); font-size:12px;">Full access to upload/remove Math video lessons and broadcast alerts.</small>
+        </div>
+
+        <!-- Quick Video Addition & Upload Form for Admin -->
+        <div style="background:var(--bg-card-secondary); padding:16px; border-radius:18px; margin-bottom:16px; border:1px solid var(--border-subtle);">
+          <h4 style="font-size:14px; font-weight:700; margin-bottom:10px; color:var(--text-primary);">+ Upload & Publish Math Video Lesson</h4>
+          <form onsubmit="handleQuickAddVideo(event)">
+            <div class="form-group">
+              <input type="text" id="admin-add-video-title" class="form-input" placeholder="Math Lesson Title" required style="padding:10px;">
+            </div>
+            <div class="form-group">
+              <input type="text" id="admin-add-video-instructor" class="form-input" placeholder="Instructor Name" required style="padding:10px;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:12px; color:var(--text-secondary); font-weight:600;">Upload Video File (MP4, WebM)</label>
+              <input type="file" id="admin-add-video-file" class="form-input" accept="video/*" onchange="handleModalFileSelect(event)" style="padding:8px;">
+            </div>
+            <div class="form-group">
+              <input type="url" id="admin-add-video-url" class="form-input" placeholder="Or Video MP4 Direct Link" style="padding:10px;">
+            </div>
+            <button type="submit" class="btn-primary" style="padding:10px 14px; font-size:13px;">
+              <i class="ri-upload-cloud-line"></i> Upload & Publish Math Video
+            </button>
+          </form>
+        </div>
+
+        <a href="admin.html" class="btn-secondary" style="text-decoration:none; text-align:center; font-size:13px; margin-bottom:10px; justify-content:center;">
+          <i class="ri-dashboard-line"></i> Open Full Educator Admin Dashboard (admin.html)
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="scripts/firebase-config.js"></script>
+  <script src="scripts/ai-assistant.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+</html>

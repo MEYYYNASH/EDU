@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edu STUDENT | Mathematics Educator Admin Dashboard</title>
+  <meta name="description" content="Edu STUDENT Mathematics Educator Admin Dashboard for Managing Videos and Platform Info.">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles/main.css">
+  <style>
+    body {
+      overflow-y: auto !important;
+      background-color: var(--bg-app);
+    }
+    .admin-container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px 60px 20px;
+    }
+    .admin-header-card {
+      background: var(--color-royal-gradient);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-royal);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Access Denied Banner Container (Hidden by default) -->
+  <div id="access-denied-view" class="admin-container" style="display:none; text-align:center; padding-top:80px;">
+    <div class="section-card" style="padding:40px 20px;">
+      <i class="ri-shield-keyhole-line" style="font-size:64px; color:var(--color-danger);"></i>
+      <h2 style="font-size:24px; font-weight:800; margin-top:16px; color:var(--color-danger);">Access Denied</h2>
+      <p style="font-size:14px; color:var(--text-secondary); margin:10px 0 24px 0;">
+        Only Authorized Admin accounts (<strong>penhbormey011427809@gmail.com</strong> or <strong>admin@gmail.com</strong>) can access the Educator Admin Dashboard.
+      </p>
+      <a href="index.html" class="btn-primary" style="display:inline-flex; width:auto; padding:12px 24px;">
+        <i class="ri-home-5-line"></i> Return to Main App & Sign In
+      </a>
+    </div>
+  </div>
+
+  <!-- Admin Main Dashboard Content -->
+  <div id="admin-main-view" class="admin-container" style="display:none;">
+    
+    <!-- Admin Header Banner -->
+    <div class="admin-header-card">
+      <div>
+        <span style="font-size:12px; font-weight:700; opacity:0.9; letter-spacing:0.5px;">SUPER EDUCATOR CONTROL CENTER</span>
+        <h2 style="font-size:24px; font-weight:800; margin-top:2px;">Mathematics Educator Admin Dashboard</h2>
+        <p style="font-size:13px; opacity:0.9; margin-top:4px;">Logged in Admin: <span id="admin-user-email">admin@gmail.com</span></p>
+      </div>
+      <a href="index.html" class="arrow-circle-btn" style="text-decoration:none;" title="Back to Main App">
+        <i class="ri-home-5-line"></i>
+      </a>
+    </div>
+
+    <div class="grid-2col">
+      <!-- 🎬 Video Setup & Upload Form -->
+      <div class="section-card">
+        <div class="section-card-title">
+          <span>Upload & Setup Math Lesson Video</span>
+          <i class="ri-video-add-line" style="color:var(--color-royal); font-size:22px;"></i>
+        </div>
+
+        <form id="admin-video-form" onsubmit="handleAddVideo(event)">
+          <div class="form-group">
+            <label class="form-label">Video Lesson Title</label>
+            <input type="text" id="video-title-input" class="form-input" placeholder="e.g. Calculus Derivatives & Integrals 101" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Instructor Name</label>
+            <input type="text" id="video-instructor-input" class="form-input" placeholder="e.g. Prof. Alan Turing" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Subject Workspace Category</label>
+            <select id="video-category-input" class="form-input">
+              <option value="Mathematics">Mathematics</option>
+            </select>
+          </div>
+
+          <!-- Video File Upload Input -->
+          <div class="form-group">
+            <label class="form-label" style="display:flex; align-items:center; gap:6px;">
+              <i class="ri-upload-2-line" style="color:var(--color-royal);"></i> Upload Video File (MP4, WebM)
+            </label>
+            <input type="file" id="video-file-input" class="form-input" accept="video/*" onchange="handleFileSelect(event)">
+            <small style="color:var(--text-secondary); font-size:11px; margin-top:4px; display:block;">Select a video file from your computer/device or enter a URL below.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Or Video MP4 URL Direct Link</label>
+            <input type="url" id="video-url-input" class="form-input" placeholder="https://domain.com/math_video.mp4">
+          </div>
+
+          <button type="submit" class="btn-primary" style="margin-top:10px;">
+            <i class="ri-upload-cloud-line"></i> Publish Math Video to Stream
+          </button>
+        </form>
+      </div>
+
+      <!-- 📢 Platform Info & Announcement Setup Form -->
+      <div class="section-card">
+        <div class="section-card-title">
+          <span>Broadcast Platform Info & Alert</span>
+          <i class="ri-notification-badge-line" style="color:var(--color-gold); font-size:22px;"></i>
+        </div>
+
+        <form id="admin-info-form" onsubmit="handleBroadcastInfo(event)">
+          <div class="form-group">
+            <label class="form-label">Info Header Title</label>
+            <input type="text" id="info-title-input" class="form-input" placeholder="e.g. Math Exam Schedule Released" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Info Details & Description</label>
+            <textarea id="info-desc-input" class="form-input" rows="4" placeholder="Write announcement details for all enrolled math students..." required style="resize:none;"></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary" style="margin-top:10px; background:var(--color-gold);">
+            <i class="ri-broadcast-line"></i> Broadcast Announcement
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 📊 Live Active Videos & Info List -->
+    <div class="section-card" style="margin-top:20px;">
+      <div class="section-card-title">
+        <span>Active Published Math Videos & Stream Feeds</span>
+        <i class="ri-list-check-2" style="color:var(--color-royal); font-size:22px;"></i>
+      </div>
+
+      <div id="admin-content-list">
+        <!-- Dynamically Populated -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const ADMIN_EMAILS = ["penhbormey011427809@gmail.com", "admin@gmail.com"];
+    let adminVideos = JSON.parse(localStorage.getItem('edu_admin_videos')) || [];
+    let selectedFileUrl = "";
+
+    function checkAdminAuth() {
+      const savedSession = localStorage.getItem("edu_user_session");
+      let currentUserEmail = "";
+
+      if (savedSession) {
+        try {
+          const user = JSON.parse(savedSession);
+          currentUserEmail = user.email ? user.email.toLowerCase() : "";
+        } catch (e) {}
+      }
+
+      const hasAccess = ADMIN_EMAILS.some(email => email.toLowerCase() === currentUserEmail);
+
+      if (!hasAccess) {
+        document.getElementById("access-denied-view").style.display = "block";
+        document.getElementById("admin-main-view").style.display = "none";
+      } else {
+        document.getElementById("access-denied-view").style.display = "none";
+        document.getElementById("admin-main-view").style.display = "block";
+        document.getElementById("admin-user-email").innerText = currentUserEmail;
+        renderAdminList();
+      }
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        selectedFileUrl = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderAdminList() {
+      const container = document.getElementById("admin-content-list");
+      if (!container) return;
+
+      if (adminVideos.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">No math videos published yet. Use the form above to add your first math video!</div>`;
+        return;
+      }
+
+      container.innerHTML = adminVideos.map(v => `
+        <div class="item-row" style="padding:14px; border:1px solid var(--border-subtle); border-radius:16px; margin-bottom:10px;">
+          <div class="item-icon-box">
+            <i class="ri-calculator-line"></i>
+          </div>
+          <div class="item-info">
+            <div class="item-title">${v.title}</div>
+            <div class="item-subtitle">${v.instructor} • Category: ${v.category}</div>
+          </div>
+          <button class="btn-secondary" onclick="deleteAdminVideo(${v.id})" style="color:var(--color-danger); border-color:rgba(239,68,68,0.2); font-size:12px; padding:6px 12px;">
+            <i class="ri-delete-bin-line"></i> Delete
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function handleAddVideo(e) {
+      e.preventDefault();
+      const title = document.getElementById("video-title-input").value;
+      const instructor = document.getElementById("video-instructor-input").value;
+      const category = document.getElementById("video-category-input").value;
+      const urlInput = document.getElementById("video-url-input").value;
+
+      const finalUrl = selectedFileUrl || urlInput;
+
+      if (!finalUrl) {
+        alert("Please upload a video file or enter a video URL!");
+        return;
+      }
+
+      adminVideos.unshift({
+        id: Date.now(),
+        title,
+        instructor,
+        category,
+        url: finalUrl
+      });
+
+      localStorage.setItem('edu_admin_videos', JSON.stringify(adminVideos));
+      selectedFileUrl = "";
+      document.getElementById("video-file-input").value = "";
+      renderAdminList();
+      alert("✅ Math video uploaded & published successfully to Edu STUDENT platform!");
+      e.target.reset();
+    }
+
+    function handleBroadcastInfo(e) {
+      e.preventDefault();
+      const title = document.getElementById("info-title-input").value;
+      const desc = document.getElementById("info-desc-input").value;
+
+      alert(`✅ Platform Broadcast Sent!\n\nTitle: ${title}\nDescription: ${desc}`);
+      e.target.reset();
+    }
+
+    function deleteAdminVideo(id) {
+      adminVideos = adminVideos.filter(v => v.id !== id);
+      localStorage.setItem('edu_admin_videos', JSON.stringify(adminVideos));
+      renderAdminList();
+    }
+
+    document.addEventListener("DOMContentLoaded", checkAdminAuth);
+  </script>
+</body>
+</html>

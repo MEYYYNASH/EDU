@@ -1,0 +1,21 @@
+{
+  "name": "Edu STUDENT - Mobile Learning Platform",
+  "short_name": "Edu STUDENT",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a12",
+  "theme_color": "#00ffff",
+  "description": "Learn. Practice. Grow. Premier mobile-first student learning platform.",
+  "icons": [
+    {
+      "src": "assets/avatar.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "assets/avatar.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
