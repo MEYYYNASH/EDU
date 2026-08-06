@@ -114,6 +114,18 @@ function getCombinedUsers() {
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
   const dummyEmails = ["sopheak@edustudent.io", "bormey@edustudent.io", "student@edustudent.io"];
   stored = stored.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
+
+  // Ensure Admin account Sithpongrin4 is registered in directory across all devices
+  if (!stored.some(u => u.email && u.email.toLowerCase() === "sithpongrin4@gmail.com")) {
+    stored.push({
+      name: "Sithpongrin4",
+      username: "sithpongrin4",
+      email: "sithpongrin4@gmail.com",
+      school: "Global Learning Institute",
+      avatar: "assets/default_avatar.jpg"
+    });
+  }
+
   localStorage.setItem('edu_all_users', JSON.stringify(stored));
   return stored;
 }
