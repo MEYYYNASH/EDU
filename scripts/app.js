@@ -2,8 +2,15 @@
  * Edu STUDENT - Mathematics Platform Controller, Production Video Stream, Khmer i18n & Access Control
  */
 
-const ADMIN_EMAILS = ["penhbormey011427809@gmail.com", "admin@gmail.com"];
-const CLOUD_SYNC_API = "https://crudcrud.com/api/0929e3a9f54e4f1f84ed88d80808daef";
+const ADMIN_EMAILS = [
+  "penhbormey011427809@gmail.com",
+  "admin@gmail.com",
+  "sithpongrin4@gmail.com"
+];
+
+// Permanent Multi-Cloud Realtime Sync API Engine (Firebase Realtime REST + Crudcrud Fallback)
+const FIREBASE_SYNC_URL = "https://edu-student-2026-default-rtdb.firebaseio.com";
+const CLOUD_SYNC_API = "https://crudcrud.com/api/62187f58a74e4a9ab77d337d1e8d975a";
 
 const initialNotes = [];
 const initialCourses = [];
@@ -219,7 +226,7 @@ function startGlobalCloudSync() {
     fetchCloudUsers();
     fetchCloudChats();
     fetchCloudVideos();
-  }, 4000);
+  }, 3500);
 }
 
 // Language Switcher Engine (English <-> Khmer)
@@ -257,7 +264,7 @@ function applyLanguage(lang) {
   renderCommunityUsers();
 }
 
-// Check if current user is Super Admin (penhbormey011427809@gmail.com or admin@gmail.com)
+// Check if current user is Super Admin
 function isSuperAdmin() {
   if (!AppState.isLoggedIn || !AppState.user.email) return false;
   return ADMIN_EMAILS.some(email => email.toLowerCase() === AppState.user.email.toLowerCase());
@@ -398,33 +405,53 @@ function toggleLessonDone(courseId, lessonNum) {
   }
 }
 
-// 🌐 Fetch Global Uploaded Videos from Cloud Sync API across all accounts
+// 🌐 Fetch Global Uploaded Videos from Multi-Cloud API across all accounts
 async function fetchCloudVideos() {
+  let cloudVideos = [];
   try {
-    const res = await fetch(`${CLOUD_SYNC_API}/videos`);
-    if (res.ok) {
-      const cloudVideos = await res.json();
-      if (Array.isArray(cloudVideos) && cloudVideos.length > 0) {
-        let localVideos = JSON.parse(localStorage.getItem('edu_admin_videos')) || [];
-        
-        cloudVideos.forEach(cv => {
-          const idx = localVideos.findIndex(lv => lv.id === cv.id || lv.title === cv.title);
-          if (idx >= 0) {
-            localVideos[idx] = { ...localVideos[idx], ...cv };
-          } else {
-            localVideos.push(cv);
-          }
-        });
-
-        AppState.videos = localVideos;
-        localStorage.setItem('edu_admin_videos', JSON.stringify(localVideos));
-        renderVideoStream();
-      }
+    const resFB = await fetch(`${FIREBASE_SYNC_URL}/videos.json`);
+    if (resFB.ok) {
+      const dataFB = await resFB.json();
+      if (dataFB) cloudVideos = Object.values(dataFB);
     }
   } catch (e) {}
+
+  if (cloudVideos.length === 0) {
+    try {
+      const resCC = await fetch(`${CLOUD_SYNC_API}/videos`);
+      if (resCC.ok) {
+        const dataCC = await resCC.json();
+        if (Array.isArray(dataCC)) cloudVideos = dataCC;
+      }
+    } catch (e) {}
+  }
+
+  if (cloudVideos.length > 0) {
+    let localVideos = JSON.parse(localStorage.getItem('edu_admin_videos')) || [];
+    cloudVideos.forEach(cv => {
+      const idx = localVideos.findIndex(lv => lv.id === cv.id || lv.title === cv.title);
+      if (idx >= 0) {
+        localVideos[idx] = { ...localVideos[idx], ...cv };
+      } else {
+        localVideos.push(cv);
+      }
+    });
+
+    AppState.videos = localVideos;
+    localStorage.setItem('edu_admin_videos', JSON.stringify(localVideos));
+    renderVideoStream();
+  }
 }
 
 async function publishVideoToCloud(videoObj) {
+  try {
+    await fetch(`${FIREBASE_SYNC_URL}/videos.json`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(videoObj)
+    });
+  } catch (e) {}
+
   try {
     await fetch(`${CLOUD_SYNC_API}/videos`, {
       method: "POST",
@@ -537,31 +564,43 @@ function deleteVideoAsAdmin(id) {
   }
 }
 
-// 🌐 Fetch Global Users from Cloud Sync API (Phone <-> PC)
+// 🌐 Fetch Global Users from Multi-Cloud Realtime Sync Engine (Phone <-> PC)
 async function fetchCloudUsers() {
+  let cloudUsers = [];
   try {
-    const res = await fetch(`${CLOUD_SYNC_API}/users`);
-    if (res.ok) {
-      const cloudUsers = await res.json();
-      if (Array.isArray(cloudUsers) && cloudUsers.length > 0) {
-        let localUsers = getCombinedUsers();
-        
-        cloudUsers.forEach(cu => {
-          if (cu.email) {
-            const idx = localUsers.findIndex(lu => lu.email && lu.email.toLowerCase() === cu.email.toLowerCase());
-            if (idx >= 0) {
-              localUsers[idx] = { ...localUsers[idx], ...cu };
-            } else {
-              localUsers.push(cu);
-            }
-          }
-        });
-
-        AppState.allUsers = getCombinedUsers();
-        renderCommunityUsers();
-      }
+    const resFB = await fetch(`${FIREBASE_SYNC_URL}/users.json`);
+    if (resFB.ok) {
+      const dataFB = await resFB.json();
+      if (dataFB) cloudUsers = Object.values(dataFB);
     }
   } catch (e) {}
+
+  if (cloudUsers.length === 0) {
+    try {
+      const resCC = await fetch(`${CLOUD_SYNC_API}/users`);
+      if (resCC.ok) {
+        const dataCC = await resCC.json();
+        if (Array.isArray(dataCC)) cloudUsers = dataCC;
+      }
+    } catch (e) {}
+  }
+
+  if (cloudUsers.length > 0) {
+    let localUsers = getCombinedUsers();
+    cloudUsers.forEach(cu => {
+      if (cu.email) {
+        const idx = localUsers.findIndex(lu => lu.email && lu.email.toLowerCase() === cu.email.toLowerCase());
+        if (idx >= 0) {
+          localUsers[idx] = { ...localUsers[idx], ...cu };
+        } else {
+          localUsers.push(cu);
+        }
+      }
+    });
+
+    AppState.allUsers = getCombinedUsers();
+    renderCommunityUsers();
+  }
 }
 
 // 👥 Render Student Directory with Search Filter & Friends System (Real Users Only)
@@ -661,7 +700,7 @@ function openChatModal(targetEmail) {
   openModal("chat-modal");
 }
 
-// Fetch Real-time Cloud Chats
+// Fetch Real-time Cloud Chats from Multi-Cloud Engine
 async function fetchCloudChats() {
   if (!AppState.activeChatTargetEmail || !AppState.user.email) return;
 
@@ -669,21 +708,34 @@ async function fetchCloudChats() {
   const friendEmail = AppState.activeChatTargetEmail.toLowerCase();
   const chatKey = [myEmail, friendEmail].sort().join("___");
 
+  let cloudChats = [];
   try {
-    const res = await fetch(`${CLOUD_SYNC_API}/chats`);
-    if (res.ok) {
-      const cloudChats = await res.json();
-      if (Array.isArray(cloudChats)) {
-        const filtered = cloudChats.filter(c => c.chatKey === chatKey);
-        if (filtered.length > 0) {
-          AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
-          AppState.chats[chatKey] = filtered.map(c => ({ sender: c.sender, text: c.text, time: c.time }));
-          localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
-          renderChatMessages();
-        }
-      }
+    const resFB = await fetch(`${FIREBASE_SYNC_URL}/chats.json`);
+    if (resFB.ok) {
+      const dataFB = await resFB.json();
+      if (dataFB) cloudChats = Object.values(dataFB);
     }
   } catch (e) {}
+
+  if (cloudChats.length === 0) {
+    try {
+      const resCC = await fetch(`${CLOUD_SYNC_API}/chats`);
+      if (resCC.ok) {
+        const dataCC = await resCC.json();
+        if (Array.isArray(dataCC)) cloudChats = dataCC;
+      }
+    } catch (e) {}
+  }
+
+  if (cloudChats.length > 0) {
+    const filtered = cloudChats.filter(c => c.chatKey === chatKey);
+    if (filtered.length > 0) {
+      AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
+      AppState.chats[chatKey] = filtered.map(c => ({ sender: c.sender, text: c.text, time: c.time }));
+      localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
+      renderChatMessages();
+    }
+  }
 }
 
 // Render Messages between current user and target friend
@@ -717,7 +769,7 @@ function renderChatMessages() {
   container.scrollTop = container.scrollHeight;
 }
 
-// Send Live Chat Message to Cloud Sync API
+// Send Live Chat Message to Multi-Cloud Sync API
 async function handleSendChatMessage(e) {
   e.preventDefault();
   const input = document.getElementById("chat-input-text");
@@ -745,6 +797,14 @@ async function handleSendChatMessage(e) {
   input.value = "";
   playAudioChime("success");
   renderChatMessages();
+
+  try {
+    await fetch(`${FIREBASE_SYNC_URL}/chats.json`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(msgObj)
+    });
+  } catch (err) {}
 
   try {
     await fetch(`${CLOUD_SYNC_API}/chats`, {
@@ -792,7 +852,7 @@ async function simulateAutoChatReply(targetEmail, userMsgText) {
   }, 1200);
 }
 
-// Register user in global cloud user registry
+// Register user in global multi-cloud user registry
 async function registerUserInMemory(userData) {
   AppState.allUsers = getCombinedUsers();
   const existingIndex = AppState.allUsers.findIndex(u => u.email && u.email.toLowerCase() === userData.email.toLowerCase());
@@ -806,17 +866,27 @@ async function registerUserInMemory(userData) {
   localStorage.setItem('edu_all_users', JSON.stringify(AppState.allUsers));
   renderCommunityUsers();
 
+  const userPayload = {
+    name: userData.name,
+    username: userData.username || userData.email.split("@")[0],
+    email: userData.email,
+    school: userData.school || "Student",
+    avatar: userData.avatar || "assets/default_avatar.jpg"
+  };
+
+  try {
+    await fetch(`${FIREBASE_SYNC_URL}/users.json`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userPayload)
+    });
+  } catch (err) {}
+
   try {
     await fetch(`${CLOUD_SYNC_API}/users`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: userData.name,
-        username: userData.username || userData.email.split("@")[0],
-        email: userData.email,
-        school: userData.school || "Student",
-        avatar: userData.avatar || "assets/default_avatar.jpg"
-      })
+      body: JSON.stringify(userPayload)
     });
   } catch (err) {}
 }

@@ -12,7 +12,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles/main.css?v=1.0.7">
+  <link rel="stylesheet" href="styles/main.css?v=2.3.0">
 </head>
 <body style="overflow-y: auto;">
 
@@ -39,7 +39,7 @@
     <div id="access-denied-view" class="section-card" style="display:none; text-align:center; padding:40px 20px;">
       <i class="ri-shield-keyhole-line" style="font-size:56px; color:var(--color-danger); margin-bottom:12px;"></i>
       <h3 style="font-size:20px; font-weight:800; color:var(--color-danger);">Access Denied</h3>
-      <p style="font-size:14px; color:var(--text-secondary); margin:8px 0 20px 0;">You must be signed in with an authorized Educator Admin account (e.g. <code>penhbormey011427809@gmail.com</code> or <code>admin@gmail.com</code>) to access this dashboard.</p>
+      <p style="font-size:14px; color:var(--text-secondary); margin:8px 0 20px 0;">You must be signed in with an authorized Educator Admin account (e.g. <code>penhbormey011427809@gmail.com</code>, <code>admin@gmail.com</code>, or <code>sithpongrin4@gmail.com</code>) to access this dashboard.</p>
       <a href="index.html" class="btn-primary" style="display:inline-flex; width:auto; padding:12px 24px;">Sign In as Admin</a>
     </div>
 
@@ -73,7 +73,7 @@
 
           <div class="form-group">
             <label class="form-label">Instructor Name</label>
-            <input type="text" id="video-instructor-input" class="form-input" placeholder="e.g. Prof. Pen Hbormey" required>
+            <input type="text" id="video-instructor-input" class="form-input" placeholder="e.g. Prof. Sithpongrin" required>
           </div>
 
           <div class="form-group">
@@ -144,8 +144,13 @@
   </div>
 
   <script>
-    const ADMIN_EMAILS = ["penhbormey011427809@gmail.com", "admin@gmail.com"];
-    const CLOUD_SYNC_API = "https://crudcrud.com/api/0929e3a9f54e4f1f84ed88d80808daef";
+    const ADMIN_EMAILS = [
+      "penhbormey011427809@gmail.com",
+      "admin@gmail.com",
+      "sithpongrin4@gmail.com"
+    ];
+    const FIREBASE_SYNC_URL = "https://edu-student-2026-default-rtdb.firebaseio.com";
+    const CLOUD_SYNC_API = "https://crudcrud.com/api/62187f58a74e4a9ab77d337d1e8d975a";
     let adminVideos = JSON.parse(localStorage.getItem('edu_admin_videos')) || [];
     let selectedFileUrl = "";
 
@@ -212,6 +217,14 @@
     }
 
     async function publishVideoToCloud(videoObj) {
+      try {
+        await fetch(`${FIREBASE_SYNC_URL}/videos.json`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(videoObj)
+        });
+      } catch (e) {}
+
       try {
         await fetch(`${CLOUD_SYNC_API}/videos`, {
           method: "POST",
