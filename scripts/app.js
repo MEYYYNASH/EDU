@@ -5,32 +5,7 @@
 const ADMIN_EMAILS = ["penhbormey011427809@gmail.com", "admin@gmail.com"];
 const CLOUD_SYNC_API = "https://crudcrud.com/api/0929e3a9f54e4f1f84ed88d80808daef";
 
-const defaultStudents = [
-  {
-    name: "Meynash Admin",
-    username: "meyyynash",
-    email: "penhbormey011427809@gmail.com",
-    school: "Global Edu Educator",
-    avatar: "assets/default_avatar.jpg"
-  },
-  {
-    name: "Sopheak Math",
-    username: "sopheak_math",
-    email: "sopheak@edustudent.io",
-    school: "Phnom Penh Institute",
-    avatar: "assets/default_avatar.jpg"
-  },
-  {
-    name: "Bormey Scholar",
-    username: "bormey_scholar",
-    email: "bormey@edustudent.io",
-    school: "Royal University",
-    avatar: "assets/default_avatar.jpg"
-  }
-];
-
 const initialNotes = [];
-
 const initialCourses = [];
 
 const translations = {
@@ -127,13 +102,12 @@ function getStoredCourses() {
   }
 }
 
+// Retrieve ONLY REAL accounts and filter out any dummy accounts
 function getCombinedUsers() {
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
-  defaultStudents.forEach(ds => {
-    if (!stored.some(u => u.email && u.email.toLowerCase() === ds.email.toLowerCase())) {
-      stored.push(ds);
-    }
-  });
+  const dummyEmails = ["sopheak@edustudent.io", "bormey@edustudent.io", "student@edustudent.io"];
+  stored = stored.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
+  localStorage.setItem('edu_all_users', JSON.stringify(stored));
   return stored;
 }
 
@@ -322,7 +296,7 @@ function openChatSelectorModal() {
   }
 
   if (otherStudents.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">${isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។' : 'No students found.'}</div>`;
+    container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">${isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។' : 'No registered students found yet.'}</div>`;
   } else {
     container.innerHTML = otherStudents.map(u => `
       <div class="item-row" onclick="closeModal('chat-select-modal'); openChatModal('${u.email}')" style="border:1px solid var(--border-subtle); padding:10px 14px; border-radius:16px; cursor:pointer;">
@@ -583,15 +557,14 @@ async function fetchCloudUsers() {
           }
         });
 
-        AppState.allUsers = localUsers;
-        localStorage.setItem('edu_all_users', JSON.stringify(localUsers));
+        AppState.allUsers = getCombinedUsers();
         renderCommunityUsers();
       }
     }
   } catch (e) {}
 }
 
-// 👥 Render Student Directory with Search Filter & Friends System
+// 👥 Render Student Directory with Search Filter & Friends System (Real Users Only)
 function renderCommunityUsers() {
   const container = document.getElementById("community-users-list");
   if (!container) return;
@@ -618,7 +591,7 @@ function renderCommunityUsers() {
   if (otherStudents.length === 0) {
     container.innerHTML = `
       <div style="text-align:center; padding:18px 0; color:var(--text-muted); font-size:13px;">
-        ${query ? (isKm ? 'រកមិនឃើញសិស្សឈ្មោះនេះទេ' : 'No student found matching search.') : (isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។ បង្កើតគណនីបន្ថែមដើម្បីធ្វើការឆាត!' : 'No other students registered yet. Create another account to add friends & chat!')}
+        ${query ? (isKm ? 'រកមិនឃើញសិស្សឈ្មោះនេះទេ' : 'No student found matching search.') : (isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។ បង្កើតគណនីបន្ថែមលើទូរស័ព្ទ ឬ PC ដើម្បីឆាត!' : 'No other registered students found. Register an account on another phone or PC to add friends & chat!')}
       </div>
     `;
     return;
