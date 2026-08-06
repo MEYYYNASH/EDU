@@ -15,7 +15,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles/main.css?v=1.0.6">
+  <link rel="stylesheet" href="styles/main.css?v=1.0.7">
 </head>
 <body>
 
@@ -161,7 +161,7 @@
             <i class="ri-film-line" style="color:var(--color-royal); font-size:20px;"></i>
           </div>
 
-          <!-- Dynamic Video Stream Grid (Managed live by Admin) -->
+          <!-- Dynamic Video Stream Grid (Managed live by Admin & Cloud Synced) -->
           <div class="grid-2col" id="video-stream-grid">
             <!-- Dynamically populated via JS -->
           </div>
@@ -258,6 +258,11 @@
             <i class="ri-user-shared-line" style="color:var(--color-royal); font-size:20px;"></i>
           </div>
 
+          <!-- Live Student Search Input -->
+          <div style="margin-bottom:14px;">
+            <input type="text" id="search-student-input" class="form-input" placeholder="🔍 Search students by name or @username..." oninput="renderCommunityUsers()" style="padding:10px 14px; font-size:13px; border-radius:14px;">
+          </div>
+
           <div id="community-users-list" style="display:flex; flex-direction:column; gap:10px;">
             <!-- Dynamically Rendered via JS -->
           </div>
@@ -325,6 +330,8 @@
           </div>
           <i class="ri-close-line" onclick="closeModal('chat-select-modal')" style="font-size:26px; cursor:pointer;"></i>
         </div>
+
+        <input type="text" id="search-chat-friend-input" class="form-input" placeholder="🔍 Search friend by name..." oninput="openChatSelectorModal()" style="margin-bottom:12px; font-size:13px; border-radius:14px; padding:10px 14px;">
 
         <div id="chat-select-list" style="display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto;">
           <!-- Dynamically populated via JS -->
@@ -716,8 +723,8 @@
   </div>
 
   <!-- JavaScript Modules with Cache Buster -->
-  <script src="scripts/firebase-config.js?v=1.0.6"></script>
-  <script src="scripts/ai-assistant.js?v=1.0.6"></script>
-  <script src="scripts/app.js?v=1.0.6"></script>
+  <script src="scripts/firebase-config.js?v=1.0.7"></script>
+  <script src="scripts/ai-assistant.js?v=1.0.7"></script>
+  <script src="scripts/app.js?v=1.0.7"></script>
 </body>
 </html>

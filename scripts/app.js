@@ -21,7 +21,7 @@ const translations = {
     daily_challenge_label: "DAILY CHALLENGE",
     daily_challenge_title: "Complete Active Recall Quiz",
     daily_challenge_desc: "Earn +150 XP & increase your study streak!",
-    start_btn: "Start",
+    start_btn: "Start Quiz",
     leaderboard_title: "Top Student Leaderboard",
     video_stream_title: "Mathematics Video Stream",
     my_courses_title: "My Mathematics Courses",
@@ -59,7 +59,7 @@ const translations = {
     daily_challenge_label: "ការប្រកួតប្រជែងប្រចាំថ្ងៃ",
     daily_challenge_title: "ធ្វើលំហាត់ស្ទង់ចំណេះដឹង",
     daily_challenge_desc: "ទទួលបាន +150 XP និងបង្កើន streak សិក្សា!",
-    start_btn: "ចាប់ផ្តើម",
+    start_btn: "ចាប់ផ្តើមលំហាត់",
     leaderboard_title: "តារាងសិស្សពូកែ",
     video_stream_title: "វីដេអូបង្រៀនគណិតវិទ្យា",
     my_courses_title: "វគ្គសិក្សាគណិតវិទ្យារបស់ខ្ញុំ",
@@ -202,13 +202,15 @@ document.addEventListener("DOMContentLoaded", () => {
   startGlobalCloudSync();
 });
 
-// Start Global Real-time Cross-Device Cloud Syncing (Phone <-> PC)
+// Start Global Real-time Cross-Device Cloud Syncing (Phone <-> PC) for Users, Chats & Videos
 function startGlobalCloudSync() {
   fetchCloudUsers();
   fetchCloudChats();
+  fetchCloudVideos();
   setInterval(() => {
     fetchCloudUsers();
     fetchCloudChats();
+    fetchCloudVideos();
   }, 4000);
 }
 
@@ -263,7 +265,7 @@ function openAdminModal() {
   openModal("admin-modal");
 }
 
-// Open Quick Chat Selector Modal
+// Open Quick Chat Selector Modal with Live Name Search Filter
 function openChatSelectorModal() {
   const container = document.getElementById("chat-select-list");
   if (!container) return;
@@ -272,10 +274,21 @@ function openChatSelectorModal() {
   const isKm = AppState.lang === 'km';
   const currentUserEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
 
-  const otherStudents = AppState.allUsers.filter(u => u.email && u.email.toLowerCase() !== currentUserEmail);
+  const searchInput = document.getElementById("search-chat-friend-input");
+  const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+  let otherStudents = AppState.allUsers.filter(u => u.email && u.email.toLowerCase() !== currentUserEmail);
+
+  if (query) {
+    otherStudents = otherStudents.filter(u => 
+      (u.name && u.name.toLowerCase().includes(query)) ||
+      (u.username && u.username.toLowerCase().includes(query)) ||
+      (u.email && u.email.toLowerCase().includes(query))
+    );
+  }
 
   if (otherStudents.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">${isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។' : 'No other students registered yet.'}</div>`;
+    container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">${isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។' : 'No students found.'}</div>`;
   } else {
     container.innerHTML = otherStudents.map(u => `
       <div class="item-row" onclick="closeModal('chat-select-modal'); openChatModal('${u.email}')" style="border:1px solid var(--border-subtle); padding:10px 14px; border-radius:16px; cursor:pointer;">
@@ -377,6 +390,42 @@ function toggleLessonDone(courseId, lessonNum) {
   }
 }
 
+// 🌐 Fetch Global Uploaded Videos from Cloud Sync API across all accounts
+async function fetchCloudVideos() {
+  try {
+    const res = await fetch(`${CLOUD_SYNC_API}/videos`);
+    if (res.ok) {
+      const cloudVideos = await res.json();
+      if (Array.isArray(cloudVideos) && cloudVideos.length > 0) {
+        let localVideos = JSON.parse(localStorage.getItem('edu_admin_videos')) || [];
+        
+        cloudVideos.forEach(cv => {
+          const idx = localVideos.findIndex(lv => lv.id === cv.id || lv.title === cv.title);
+          if (idx >= 0) {
+            localVideos[idx] = { ...localVideos[idx], ...cv };
+          } else {
+            localVideos.push(cv);
+          }
+        });
+
+        AppState.videos = localVideos;
+        localStorage.setItem('edu_admin_videos', JSON.stringify(localVideos));
+        renderVideoStream();
+      }
+    }
+  } catch (e) {}
+}
+
+async function publishVideoToCloud(videoObj) {
+  try {
+    await fetch(`${CLOUD_SYNC_API}/videos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(videoObj)
+    });
+  } catch (e) {}
+}
+
 // Sync Admin Videos between admin.html and main app
 function renderVideoStream() {
   const container = document.getElementById("video-stream-grid");
@@ -423,7 +472,7 @@ function handleModalFileSelect(e) {
   reader.readAsDataURL(file);
 }
 
-// Quick Admin Add Video directly in App
+// Quick Admin Add Video directly in App & Sync Globally to Cloud
 function handleQuickAddVideo(e) {
   e.preventDefault();
   if (!isSuperAdmin()) {
@@ -443,21 +492,25 @@ function handleQuickAddVideo(e) {
   }
 
   if (title && instructor) {
-    AppState.videos.unshift({
+    const newVideo = {
       id: Date.now(),
       title,
       instructor,
       category: "Mathematics",
       icon: "ri-calculator-line",
       url: finalUrl
-    });
+    };
+
+    AppState.videos.unshift(newVideo);
 
     localStorage.setItem('edu_admin_videos', JSON.stringify(AppState.videos));
+    publishVideoToCloud(newVideo);
+
     AppState.modalUploadedVideoUrl = "";
     document.getElementById("admin-add-video-file").value = "";
     renderVideoStream();
     closeModal("admin-modal");
-    alert("✅ Math video successfully uploaded & published to Video Stream!");
+    alert("✅ Math video successfully uploaded & published across ALL student accounts!");
     e.target.reset();
   }
 }
@@ -504,7 +557,7 @@ async function fetchCloudUsers() {
   } catch (e) {}
 }
 
-// 👥 Render Student Directory & Friends System
+// 👥 Render Student Directory with Search Filter & Friends System
 function renderCommunityUsers() {
   const container = document.getElementById("community-users-list");
   if (!container) return;
@@ -513,13 +566,25 @@ function renderCommunityUsers() {
   const isKm = AppState.lang === 'km';
   const currentUserEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
 
+  const searchInput = document.getElementById("search-student-input");
+  const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
   // Filter out current user from student directory
-  const otherStudents = AppState.allUsers.filter(u => u.email && u.email.toLowerCase() !== currentUserEmail);
+  let otherStudents = AppState.allUsers.filter(u => u.email && u.email.toLowerCase() !== currentUserEmail);
+
+  // Apply Live Search Query Filter
+  if (query) {
+    otherStudents = otherStudents.filter(u => 
+      (u.name && u.name.toLowerCase().includes(query)) ||
+      (u.username && u.username.toLowerCase().includes(query)) ||
+      (u.email && u.email.toLowerCase().includes(query))
+    );
+  }
 
   if (otherStudents.length === 0) {
     container.innerHTML = `
       <div style="text-align:center; padding:18px 0; color:var(--text-muted); font-size:13px;">
-        ${isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។ បង្កើតគណនីបន្ថែមដើម្បីធ្វើការឆាត!' : 'No other students registered yet. Create another account to add friends & chat!'}
+        ${query ? (isKm ? 'រកមិនឃើញសិស្សឈ្មោះនេះទេ' : 'No student found matching search.') : (isKm ? 'មិនទាន់មានសិស្សផ្សេងទៀតបានចុះឈ្មោះនៅឡើយទេ។ បង្កើតគណនីបន្ថែមដើម្បីធ្វើការឆាត!' : 'No other students registered yet. Create another account to add friends & chat!')}
       </div>
     `;
     return;
@@ -550,7 +615,7 @@ function renderCommunityUsers() {
   }).join('');
 }
 
-// Add Friend Action
+// Add Friend Action with Immediate Storage & Cloud Sync
 function addFriend(targetEmail) {
   if (!AppState.isLoggedIn) {
     alert("Please sign in to add friends!");
