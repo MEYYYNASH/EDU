@@ -109,9 +109,11 @@ function getStoredCourses() {
   }
 }
 
-// Retrieve only registered users (starts completely clean with 0 pre-seeded accounts)
+// Retrieve only registered users (filters out any old test accounts)
 function getCombinedUsers() {
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  stored = stored.filter(u => u.email && u.email.toLowerCase() !== "sithpongrin4@gmail.com");
+  localStorage.setItem('edu_all_users', JSON.stringify(stored));
   return stored;
 }
 
