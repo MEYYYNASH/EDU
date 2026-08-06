@@ -109,36 +109,21 @@ function getStoredCourses() {
   }
 }
 
-// Retrieve ONLY Sithpongrin4 account and filter out all other old accounts
+// Retrieve only registered users (starts completely clean with 0 pre-seeded accounts)
 function getCombinedUsers() {
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
-  
-  // Keep ONLY Sithpongrin4 account (sithpongrin4@gmail.com)
-  stored = stored.filter(u => u.email && u.email.toLowerCase() === "sithpongrin4@gmail.com");
-
-  if (stored.length === 0) {
-    stored.push({
-      name: "Sithpongrin4",
-      username: "sithpongrin4",
-      email: "sithpongrin4@gmail.com",
-      school: "Global Learning Institute",
-      avatar: "assets/default_avatar.jpg"
-    });
-  }
-
-  localStorage.setItem('edu_all_users', JSON.stringify(stored));
   return stored;
 }
 
 const AppState = {
-  isLoggedIn: true,
+  isLoggedIn: false,
   theme: "light",
   lang: localStorage.getItem("edu_lang") || "en",
   user: {
-    name: "Sithpongrin4",
-    username: "sithpongrin4",
-    studentId: "EDU-2026-8842",
-    email: "sithpongrin4@gmail.com",
+    name: "Guest Student",
+    username: "guest",
+    studentId: "EDU-2026-0000",
+    email: "guest@edustudent.io",
     school: "Global Learning Institute",
     country: "Cambodia",
     level: 1,
@@ -1307,10 +1292,10 @@ function signOutUser() {
     localStorage.removeItem("edu_user_session");
     AppState.isLoggedIn = false;
     AppState.user = {
-      name: "Sithpongrin4",
-      username: "sithpongrin4",
-      studentId: "EDU-2026-8842",
-      email: "sithpongrin4@gmail.com",
+      name: "Guest Student",
+      username: "guest",
+      studentId: "EDU-2026-0000",
+      email: "guest@edustudent.io",
       school: "Global Learning Institute",
       country: "Cambodia",
       level: 1,
