@@ -15,7 +15,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles/main.css?v=2.0.0">
+  <link rel="stylesheet" href="styles/main.css?v=2.1.0">
 </head>
 <body>
 
@@ -40,8 +40,8 @@
           <i class="ri-pulse-line"></i>
         </div>
         <div>
-          <h3 style="font-size: 20px; font-weight: 800; line-height: 1.1; color: var(--text-primary);">Edu STUDENT</h3>
-          <span style="font-size: 13px; color: var(--text-secondary);" data-i18n="header_sub">learn management</span>
+          <h3 style="font-size: 19px; font-weight: 800; line-height: 1.1; color: var(--text-primary);">Edu STUDENT</h3>
+          <span style="font-size: 12px; color: var(--text-secondary);" data-i18n="header_sub">learn management</span>
         </div>
       </div>
 
@@ -52,8 +52,8 @@
         <div class="circle-btn" id="theme-toggle-btn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">
           <i class="ri-moon-line"></i>
         </div>
-        <div class="circle-btn" onclick="openChatSelectorModal()" title="Live Chat with Friends">
-          <i class="ri-chat-3-line" style="color:var(--color-royal);"></i>
+        <div class="circle-btn" onclick="openChatSelectorModal()" title="Live Chat with Friends" style="background:rgba(79,88,246,0.12); border-color:rgba(79,88,246,0.3);">
+          <i class="ri-chat-3-fill" style="color:var(--color-royal); font-size:20px;"></i>
         </div>
         <div class="circle-btn" onclick="openModal('ai-modal')" title="Search / AI">
           <i class="ri-search-line"></i>
@@ -115,36 +115,52 @@
           </div>
         </div>
 
-        <div class="grid-2col">
-          <!-- Daily Learning Challenge Card -->
-          <div class="section-card" style="border-left: 5px solid var(--color-royal);">
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:11px; font-weight:700; color:var(--color-royal);" data-i18n="daily_challenge_label">DAILY CHALLENGE</span>
-                <i class="ri-fire-line" style="color:var(--color-gold); font-size:18px;"></i>
-              </div>
-              <h4 style="font-size:16px; font-weight:700;" data-i18n="daily_challenge_title">Complete Active Recall Quiz</h4>
-              <p style="font-size:12px; color:var(--text-secondary);" data-i18n="daily_challenge_desc">Earn +150 XP & increase your study streak!</p>
-              <button class="btn-primary" onclick="openQuizModal()" style="width:100%; padding:10px; font-size:13px; margin-top:4px;" data-i18n="start_btn">Start Quiz</button>
-            </div>
+        <!-- 🎯 FULL-WIDTH Premium Daily Learning Challenge Hero Card -->
+        <div class="section-card" style="background: var(--color-royal-gradient); color: #ffffff; border: none; box-shadow: var(--shadow-royal); padding: 22px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:12px; font-weight:800; letter-spacing:1px; background:rgba(255,255,255,0.2); padding:4px 12px; border-radius:20px; backdrop-filter:blur(4px);" data-i18n="daily_challenge_label">🔥 DAILY CHALLENGE</span>
+            <span style="font-size:12px; font-weight:700; color:#fde047; display:flex; align-items:center; gap:4px;">
+              <i class="ri-coins-line"></i> +150 XP
+            </span>
           </div>
 
-          <!-- Real Student Leaderboard Ranking Card -->
-          <div class="section-card">
-            <div class="section-card-title">
-              <span data-i18n="leaderboard_title">Top Student Leaderboard</span>
-              <i class="ri-trophy-line" style="color:var(--color-gold); font-size:20px;"></i>
-            </div>
+          <h3 style="font-size:18px; font-weight:800; margin-bottom:6px; color:#ffffff;" data-i18n="daily_challenge_title">Complete Active Recall Quiz</h3>
+          <p style="font-size:13px; opacity:0.9; margin-bottom:16px; line-height:1.5;" data-i18n="daily_challenge_desc">Earn +150 XP & increase your study streak with today's practice test!</p>
+          
+          <button class="btn-primary" onclick="openQuizModal()" style="width:100%; background:#ffffff; color:var(--color-royal); font-size:14px; font-weight:800; padding:12px; border-radius:14px; box-shadow:0 6px 16px rgba(0,0,0,0.15);" data-i18n="start_btn">
+            ▶ Start Practice Quiz
+          </button>
+        </div>
 
-            <div class="item-row" style="padding:8px 0; border:none;">
-              <div style="font-weight:800; color:var(--color-gold); width:20px;">1</div>
-              <img id="leaderboard-user-img" src="assets/default_avatar.jpg" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+        <!-- 🏆 FULL-WIDTH Top Student Leaderboard Ranking Card -->
+        <div class="section-card">
+          <div class="section-card-title">
+            <span data-i18n="leaderboard_title">Top Student Leaderboard</span>
+            <i class="ri-trophy-line" style="color:var(--color-gold); font-size:22px;"></i>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div class="item-row" style="padding:10px 14px; border:1px solid var(--border-subtle); border-radius:16px; background:var(--bg-card-secondary);">
+              <div style="font-weight:900; color:var(--color-gold); font-size:16px; width:24px;">1</div>
+              <img id="leaderboard-user-img" src="assets/default_avatar.jpg" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:2px solid var(--color-gold);">
               <div class="item-info">
-                <div class="item-title" id="leaderboard-user-name">Student User</div>
+                <div class="item-title" id="leaderboard-user-name" style="font-size:15px;">Student User</div>
                 <div class="item-subtitle" id="leaderboard-user-xp">0 XP • Level 1</div>
               </div>
-              <span style="font-size:12px; font-weight:700; color:var(--color-gold); display:flex; align-items:center; gap:4px;">
+              <span style="font-size:12px; font-weight:800; color:var(--color-gold); display:flex; align-items:center; gap:4px; background:rgba(245,158,11,0.1); padding:4px 10px; border-radius:12px;">
                 <i class="ri-medal-fill" style="color:#f59e0b;"></i> 1st Rank
+              </span>
+            </div>
+
+            <div class="item-row" style="padding:10px 14px; border:1px solid var(--border-subtle); border-radius:16px;">
+              <div style="font-weight:800; color:#94a3b8; font-size:15px; width:24px;">2</div>
+              <img src="assets/default_avatar.jpg" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid #94a3b8;">
+              <div class="item-info">
+                <div class="item-title" style="font-size:14px;">Meynash Admin</div>
+                <div class="item-subtitle">1250 XP • Level 5</div>
+              </div>
+              <span style="font-size:12px; font-weight:700; color:#64748b; display:flex; align-items:center; gap:4px;">
+                <i class="ri-medal-fill" style="color:#94a3b8;"></i> 2nd Rank
               </span>
             </div>
           </div>
@@ -295,6 +311,11 @@
       </section>
 
     </main>
+
+    <!-- 💬 Dedicated Live Chat Quick Action FAB Button -->
+    <button class="fab-chat-btn" onclick="openChatSelectorModal()" title="Open Live Friends Chat">
+      <i class="ri-chat-3-fill"></i>
+    </button>
 
     <!-- ➕ Floating Action Plus Button -->
     <button class="fab-btn" onclick="openCreateNoteModal()" title="Create New Study Note & Reminder">
@@ -728,8 +749,8 @@
   </div>
 
   <!-- JavaScript Modules with Cache Buster -->
-  <script src="scripts/firebase-config.js?v=2.0.0"></script>
-  <script src="scripts/ai-assistant.js?v=2.0.0"></script>
-  <script src="scripts/app.js?v=2.0.0"></script>
+  <script src="scripts/firebase-config.js?v=2.1.0"></script>
+  <script src="scripts/ai-assistant.js?v=2.1.0"></script>
+  <script src="scripts/app.js?v=2.1.0"></script>
 </body>
 </html>
