@@ -1083,6 +1083,13 @@ function checkPersistentAuth() {
     }
   }
   updateAuthUI();
+
+  // If visitor has no account / is not signed in, automatically open Create Account / Sign In modal first!
+  if (!AppState.isLoggedIn) {
+    setTimeout(() => {
+      openModal("auth-modal");
+    }, 500);
+  }
 }
 
 // Update UI based on logged in / logged out state and Admin status
@@ -1305,7 +1312,11 @@ function signOutUser() {
       friends: []
     };
     updateAuthUI();
-    openModal("auth-modal");
+
+    // Automatically open Create Account / Sign In modal first right after signing out!
+    setTimeout(() => {
+      openModal("auth-modal");
+    }, 200);
   }
 }
 
