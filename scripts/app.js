@@ -873,6 +873,8 @@ async function simulateAutoChatReply(targetEmail, userMsgText) {
 
 // Register user in global multi-cloud user registry
 async function registerUserInMemory(userData) {
+  if (!userData || !userData.email) return;
+
   AppState.allUsers = getCombinedUsers();
   const existingIndex = AppState.allUsers.findIndex(u => u.email && u.email.toLowerCase() === userData.email.toLowerCase());
   
@@ -893,9 +895,11 @@ async function registerUserInMemory(userData) {
     avatar: userData.avatar || "assets/default_avatar.jpg"
   };
 
+  const safeKey = userData.email.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
   try {
-    await fetch(`${FIREBASE_SYNC_URL}/users.json`, {
-      method: "POST",
+    await fetch(`${FIREBASE_SYNC_URL}/users/${safeKey}.json`, {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userPayload)
     });
@@ -1728,6 +1732,14 @@ function setupEventListeners() {
 
   renderNotes();
   updatePomodoroUI();
+
+  // Start Realtime Background Multi-Cloud Sync Engine (Phone <-> PC)
+  setInterval(() => {
+    fetchCloudUsers();
+    if (AppState.activeChatTargetEmail) {
+      fetchCloudChats();
+    }
+  }, 4000);
 }
 
 // PWA Service Worker Registration
