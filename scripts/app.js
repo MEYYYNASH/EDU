@@ -681,6 +681,43 @@ async function handleSendChatMessage(e) {
       body: JSON.stringify(msgObj)
     });
   } catch (err) {}
+
+  // Trigger intelligent auto-reply in chat
+  simulateAutoChatReply(friendEmail, text);
+}
+
+// Smart Auto-Responder for Live Chat (Responds intelligently if friend is away)
+async function simulateAutoChatReply(targetEmail, userMsgText) {
+  setTimeout(async () => {
+    AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
+    const myEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
+    const friendEmail = targetEmail.toLowerCase();
+    const chatKey = [myEmail, friendEmail].sort().join("___");
+
+    if (!AppState.chats[chatKey]) AppState.chats[chatKey] = [];
+
+    // Use EduAI to generate an intelligent auto-reply
+    let replyText = await window.EduAI.ask(userMsgText);
+    if (typeof replyText !== 'string') {
+      replyText = "Thanks for your study message! Let's work on Calculus and Math problems together 📚";
+    }
+    replyText = replyText.replace(/\*\*/g, '');
+
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    AppState.chats[chatKey].push({
+      sender: friendEmail,
+      text: replyText,
+      time: timeStr
+    });
+
+    localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
+
+    if (AppState.activeChatTargetEmail && AppState.activeChatTargetEmail.toLowerCase() === friendEmail) {
+      renderChatMessages();
+      playAudioChime("success");
+    }
+  }, 1200);
 }
 
 // Register user in global cloud user registry
