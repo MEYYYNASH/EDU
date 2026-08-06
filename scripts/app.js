@@ -109,6 +109,18 @@ function getStoredCourses() {
   }
 }
 
+// Helper to generate unique, deterministic Student IDs based on user email
+function generateStudentId(email) {
+  if (!email || email === "guest@edustudent.io") return "EDU-2026-0000";
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) {
+    hash = ((hash << 5) - hash) + email.charCodeAt(i);
+    hash |= 0;
+  }
+  const code = Math.abs(hash % 9000) + 1000;
+  return `EDU-2026-${code}`;
+}
+
 // Retrieve all real registered users across devices (filters out old fake placeholder accounts)
 function getCombinedUsers() {
   const dummyEmails = [
@@ -121,11 +133,12 @@ function getCombinedUsers() {
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
   stored = stored.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
 
-  // Pre-seed real accounts Penhbormey011427809 & Sithpongrin4 so friends are ALWAYS visible in directory
+  // Pre-seed real accounts Penhbormey011427809 & Sithpongrin4 with unique Student IDs
   if (!stored.some(u => u.email && u.email.toLowerCase() === "penhbormey011427809@gmail.com")) {
     stored.push({
       name: "Penhbormey011427809",
       username: "penhbormey011427809",
+      studentId: "EDU-2026-0114",
       email: "penhbormey011427809@gmail.com",
       school: "Global Learning Institute",
       avatar: "assets/default_avatar.jpg"
@@ -136,11 +149,16 @@ function getCombinedUsers() {
     stored.push({
       name: "Sithpongrin4",
       username: "sithpongrin4",
+      studentId: "EDU-2026-0004",
       email: "sithpongrin4@gmail.com",
       school: "Global Learning Institute",
       avatar: "assets/default_avatar.jpg"
     });
   }
+
+  stored.forEach(u => {
+    if (!u.studentId) u.studentId = generateStudentId(u.email);
+  });
 
   localStorage.setItem('edu_all_users', JSON.stringify(stored));
   return stored;
@@ -1236,12 +1254,18 @@ function updateAuthUI() {
   const profileSchoolEl = document.getElementById("profile-display-school");
   const profileAvatarEl = document.getElementById("profile-display-avatar");
   const leaderboardImgEl = document.getElementById("leaderboard-user-img");
+  const cardStudentIdEl = document.getElementById("card-student-id");
   
+  if (!AppState.user.studentId || AppState.user.studentId === "EDU-2026-8842") {
+    AppState.user.studentId = generateStudentId(AppState.user.email);
+  }
+
   if (profileNameEl) profileNameEl.innerText = AppState.user.name;
   if (profileEmailEl) profileEmailEl.innerText = AppState.user.email;
   if (profileSchoolEl) profileSchoolEl.innerText = AppState.user.school;
   if (profileAvatarEl) profileAvatarEl.src = AppState.user.avatar || "assets/default_avatar.jpg";
   if (leaderboardImgEl) leaderboardImgEl.src = AppState.user.avatar || "assets/default_avatar.jpg";
+  if (cardStudentIdEl) cardStudentIdEl.innerText = AppState.user.studentId;
 
   renderVideoStream();
   renderAchievementsGrid();
