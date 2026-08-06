@@ -109,14 +109,14 @@ function getStoredCourses() {
   }
 }
 
-// Retrieve ONLY REAL accounts and filter out any dummy accounts
+// Retrieve ONLY Sithpongrin4 account and filter out all other old accounts
 function getCombinedUsers() {
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
-  const dummyEmails = ["sopheak@edustudent.io", "bormey@edustudent.io", "student@edustudent.io"];
-  stored = stored.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
+  
+  // Keep ONLY Sithpongrin4 account (sithpongrin4@gmail.com)
+  stored = stored.filter(u => u.email && u.email.toLowerCase() === "sithpongrin4@gmail.com");
 
-  // Ensure Admin account Sithpongrin4 is registered in directory across all devices
-  if (!stored.some(u => u.email && u.email.toLowerCase() === "sithpongrin4@gmail.com")) {
+  if (stored.length === 0) {
     stored.push({
       name: "Sithpongrin4",
       username: "sithpongrin4",
@@ -131,16 +131,16 @@ function getCombinedUsers() {
 }
 
 const AppState = {
-  isLoggedIn: false,
+  isLoggedIn: true,
   theme: "light",
   lang: localStorage.getItem("edu_lang") || "en",
   user: {
-    name: "Student User",
-    username: "student_user",
+    name: "Sithpongrin4",
+    username: "sithpongrin4",
     studentId: "EDU-2026-8842",
-    email: "student@edustudent.io",
+    email: "sithpongrin4@gmail.com",
     school: "Global Learning Institute",
-    country: "United States",
+    country: "Cambodia",
     level: 1,
     xp: 0,
     coins: 0,
@@ -1307,12 +1307,12 @@ function signOutUser() {
     localStorage.removeItem("edu_user_session");
     AppState.isLoggedIn = false;
     AppState.user = {
-      name: "Student User",
-      username: "student_user",
+      name: "Sithpongrin4",
+      username: "sithpongrin4",
       studentId: "EDU-2026-8842",
-      email: "student@edustudent.io",
+      email: "sithpongrin4@gmail.com",
       school: "Global Learning Institute",
-      country: "United States",
+      country: "Cambodia",
       level: 1,
       xp: 0,
       coins: 0,
