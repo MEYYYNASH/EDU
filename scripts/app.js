@@ -800,7 +800,9 @@ async function fetchCloudChats() {
     const resFB = await fetch(`${FIREBASE_SYNC_URL}/chats.json`);
     if (resFB.ok) {
       const dataFB = await resFB.json();
-      if (dataFB) cloudChats = Object.values(dataFB);
+      if (dataFB) {
+        cloudChats = Object.values(dataFB).filter(c => c && typeof c === 'object' && c.chatKey);
+      }
     }
   } catch (e) {}
 
@@ -809,20 +811,23 @@ async function fetchCloudChats() {
       const resCC = await fetch(`${CLOUD_SYNC_API}/chats`);
       if (resCC.ok) {
         const dataCC = await resCC.json();
-        if (Array.isArray(dataCC)) cloudChats = dataCC;
+        if (Array.isArray(dataCC)) {
+          cloudChats = dataCC.filter(c => c && typeof c === 'object' && c.chatKey);
+        }
       }
     } catch (e) {}
   }
 
-  if (cloudChats.length > 0) {
-    const filtered = cloudChats.filter(c => c.chatKey === chatKey);
-    if (filtered.length > 0) {
-      AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
-      AppState.chats[chatKey] = filtered.map(c => ({ sender: c.sender, text: c.text, time: c.time }));
-      localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
-      renderChatMessages();
-    }
-  }
+  const filtered = cloudChats.filter(c => c.chatKey === chatKey);
+  AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
+  AppState.chats[chatKey] = filtered.map(c => ({
+    id: c.id || ("msg_" + Date.now() + "_" + Math.floor(Math.random()*1000)),
+    sender: c.sender,
+    text: c.text,
+    time: c.time
+  }));
+  localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
+  renderChatMessages();
 }
 
 // Render Messages between current user and target friend
@@ -832,14 +837,14 @@ function renderChatMessages() {
 
   AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
 
-  const myEmail = AppState.user.email.toLowerCase();
+  const myEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
   const friendEmail = AppState.activeChatTargetEmail.toLowerCase();
   const chatKey = [myEmail, friendEmail].sort().join("___");
 
   const thread = AppState.chats[chatKey] || [];
 
   if (thread.length === 0) {
-    container.innerHTML = `<div style="text-align:center; margin:auto; color:var(--text-muted); font-size:12.5px;">Say hello to start chatting! 👋</div>`;
+    container.innerHTML = `<div style="text-align:center; margin:auto; color:var(--text-muted); font-size:12.5px;">Say hello to start live chatting! 👋</div>`;
     return;
   }
 
@@ -847,7 +852,12 @@ function renderChatMessages() {
     const isMine = m.sender === myEmail;
     return `
       <div class="chat-bubble ${isMine ? 'chat-bubble-own' : 'chat-bubble-other'}">
-        <div>${m.text}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <div>${m.text}</div>
+          ${isMine ? `
+            <i class="ri-delete-bin-line" onclick="unsendMessage('${m.id}')" style="font-size:14px; opacity:0.75; cursor:pointer; margin-left:6px;" title="Unsend message"></i>
+          ` : ''}
+        </div>
         <div class="chat-time">${m.time}</div>
       </div>
     `;
@@ -856,14 +866,39 @@ function renderChatMessages() {
   container.scrollTop = container.scrollHeight;
 }
 
-// Send Live Chat Message to Multi-Cloud Sync API
+// Unsend / Delete Live Chat Message
+async function unsendMessage(msgId) {
+  if (!confirm("Unsend this message for everyone?")) return;
+
+  const myEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
+  const friendEmail = AppState.activeChatTargetEmail ? AppState.activeChatTargetEmail.toLowerCase() : "";
+  const chatKey = [myEmail, friendEmail].sort().join("___");
+
+  AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
+  if (AppState.chats[chatKey]) {
+    AppState.chats[chatKey] = AppState.chats[chatKey].filter(m => m.id !== msgId);
+    localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
+  }
+
+  renderChatMessages();
+
+  try {
+    await fetch(`${FIREBASE_SYNC_URL}/chats/${msgId}.json`, { method: "DELETE" });
+  } catch (e) {}
+
+  try {
+    await fetch(`${CLOUD_SYNC_API}/chats/${msgId}`, { method: "DELETE" });
+  } catch (e) {}
+}
+
+// Send Real Live Chat Message to Multi-Cloud Sync Engine
 async function handleSendChatMessage(e) {
   e.preventDefault();
   const input = document.getElementById("chat-input-text");
   if (!input || !input.value.trim() || !AppState.activeChatTargetEmail) return;
 
   const text = input.value.trim();
-  const myEmail = AppState.user.email.toLowerCase();
+  const myEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
   const friendEmail = AppState.activeChatTargetEmail.toLowerCase();
   const chatKey = [myEmail, friendEmail].sort().join("___");
 
@@ -871,23 +906,25 @@ async function handleSendChatMessage(e) {
   if (!AppState.chats[chatKey]) AppState.chats[chatKey] = [];
 
   const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const msgId = "msg_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
 
   const msgObj = {
+    id: msgId,
     chatKey: chatKey,
     sender: myEmail,
     text: text,
     time: timeStr
   };
 
-  AppState.chats[chatKey].push({ sender: myEmail, text: text, time: timeStr });
+  AppState.chats[chatKey].push({ id: msgId, sender: myEmail, text: text, time: timeStr });
   localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
   input.value = "";
   playAudioChime("success");
   renderChatMessages();
 
   try {
-    await fetch(`${FIREBASE_SYNC_URL}/chats.json`, {
-      method: "POST",
+    await fetch(`${FIREBASE_SYNC_URL}/chats/${msgId}.json`, {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(msgObj)
     });
@@ -900,43 +937,6 @@ async function handleSendChatMessage(e) {
       body: JSON.stringify(msgObj)
     });
   } catch (err) {}
-
-  // Trigger intelligent auto-reply in chat
-  simulateAutoChatReply(friendEmail, text);
-}
-
-// Smart Auto-Responder for Live Chat (Responds intelligently if friend is away)
-async function simulateAutoChatReply(targetEmail, userMsgText) {
-  setTimeout(async () => {
-    AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
-    const myEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
-    const friendEmail = targetEmail.toLowerCase();
-    const chatKey = [myEmail, friendEmail].sort().join("___");
-
-    if (!AppState.chats[chatKey]) AppState.chats[chatKey] = [];
-
-    // Use EduAI to generate an intelligent auto-reply
-    let replyText = await window.EduAI.ask(userMsgText);
-    if (typeof replyText !== 'string') {
-      replyText = "Thanks for your study message! Let's work on Calculus and Math problems together 📚";
-    }
-    replyText = replyText.replace(/\*\*/g, '');
-
-    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    AppState.chats[chatKey].push({
-      sender: friendEmail,
-      text: replyText,
-      time: timeStr
-    });
-
-    localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
-
-    if (AppState.activeChatTargetEmail && AppState.activeChatTargetEmail.toLowerCase() === friendEmail) {
-      renderChatMessages();
-      playAudioChime("success");
-    }
-  }, 1200);
 }
 
 // Register user in global multi-cloud user registry
