@@ -15,7 +15,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles/main.css?v=1.0.7">
+  <link rel="stylesheet" href="styles/main.css?v=2.0.0">
 </head>
 <body>
 
@@ -254,8 +254,13 @@
         <!-- 👥 Registered Students Directory, Friends & Live Chat -->
         <div class="section-card">
           <div class="section-card-title">
-            <span data-i18n="community_title">Student Directory & Friends</span>
-            <i class="ri-user-shared-line" style="color:var(--color-royal); font-size:20px;"></i>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span data-i18n="community_title">Student Directory & Friends</span>
+              <i class="ri-user-shared-line" style="color:var(--color-royal); font-size:20px;"></i>
+            </div>
+            <button class="arrow-circle-btn-sm" onclick="fetchCloudUsers(); renderCommunityUsers();" title="Sync & Refresh Student List">
+              <i class="ri-refresh-line"></i>
+            </button>
           </div>
 
           <!-- Live Student Search Input -->
@@ -723,8 +728,8 @@
   </div>
 
   <!-- JavaScript Modules with Cache Buster -->
-  <script src="scripts/firebase-config.js?v=1.0.7"></script>
-  <script src="scripts/ai-assistant.js?v=1.0.7"></script>
-  <script src="scripts/app.js?v=1.0.7"></script>
+  <script src="scripts/firebase-config.js?v=2.0.0"></script>
+  <script src="scripts/ai-assistant.js?v=2.0.0"></script>
+  <script src="scripts/app.js?v=2.0.0"></script>
 </body>
 </html>

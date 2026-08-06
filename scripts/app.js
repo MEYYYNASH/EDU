@@ -5,6 +5,30 @@
 const ADMIN_EMAILS = ["penhbormey011427809@gmail.com", "admin@gmail.com"];
 const CLOUD_SYNC_API = "https://crudcrud.com/api/0929e3a9f54e4f1f84ed88d80808daef";
 
+const defaultStudents = [
+  {
+    name: "Meynash Admin",
+    username: "meyyynash",
+    email: "penhbormey011427809@gmail.com",
+    school: "Global Edu Educator",
+    avatar: "assets/default_avatar.jpg"
+  },
+  {
+    name: "Sopheak Math",
+    username: "sopheak_math",
+    email: "sopheak@edustudent.io",
+    school: "Phnom Penh Institute",
+    avatar: "assets/default_avatar.jpg"
+  },
+  {
+    name: "Bormey Scholar",
+    username: "bormey_scholar",
+    email: "bormey@edustudent.io",
+    school: "Royal University",
+    avatar: "assets/default_avatar.jpg"
+  }
+];
+
 const initialNotes = [];
 
 const initialCourses = [];
@@ -103,6 +127,16 @@ function getStoredCourses() {
   }
 }
 
+function getCombinedUsers() {
+  let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  defaultStudents.forEach(ds => {
+    if (!stored.some(u => u.email && u.email.toLowerCase() === ds.email.toLowerCase())) {
+      stored.push(ds);
+    }
+  });
+  return stored;
+}
+
 const AppState = {
   isLoggedIn: false,
   theme: "light",
@@ -134,7 +168,7 @@ const AppState = {
   videos: JSON.parse(localStorage.getItem('edu_admin_videos')) || [],
   notes: JSON.parse(localStorage.getItem('edu_user_notes')) || initialNotes,
   courses: getStoredCourses(),
-  allUsers: JSON.parse(localStorage.getItem('edu_all_users')) || [],
+  allUsers: getCombinedUsers(),
   chats: JSON.parse(localStorage.getItem('edu_user_chats')) || {},
   badges: [
     {
@@ -270,7 +304,7 @@ function openChatSelectorModal() {
   const container = document.getElementById("chat-select-list");
   if (!container) return;
 
-  AppState.allUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  AppState.allUsers = getCombinedUsers();
   const isKm = AppState.lang === 'km';
   const currentUserEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
 
@@ -536,7 +570,7 @@ async function fetchCloudUsers() {
     if (res.ok) {
       const cloudUsers = await res.json();
       if (Array.isArray(cloudUsers) && cloudUsers.length > 0) {
-        let localUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+        let localUsers = getCombinedUsers();
         
         cloudUsers.forEach(cu => {
           if (cu.email) {
@@ -562,7 +596,7 @@ function renderCommunityUsers() {
   const container = document.getElementById("community-users-list");
   if (!container) return;
 
-  AppState.allUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  AppState.allUsers = getCombinedUsers();
   const isKm = AppState.lang === 'km';
   const currentUserEmail = AppState.user.email ? AppState.user.email.toLowerCase() : "";
 
@@ -638,7 +672,7 @@ function addFriend(targetEmail) {
 
 // Open Live Chat Modal with selected Friend
 function openChatModal(targetEmail) {
-  AppState.allUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  AppState.allUsers = getCombinedUsers();
   const targetUser = AppState.allUsers.find(u => u.email && u.email.toLowerCase() === targetEmail.toLowerCase());
   
   if (!targetUser) return;
@@ -787,7 +821,7 @@ async function simulateAutoChatReply(targetEmail, userMsgText) {
 
 // Register user in global cloud user registry
 async function registerUserInMemory(userData) {
-  AppState.allUsers = JSON.parse(localStorage.getItem('edu_all_users')) || [];
+  AppState.allUsers = getCombinedUsers();
   const existingIndex = AppState.allUsers.findIndex(u => u.email && u.email.toLowerCase() === userData.email.toLowerCase());
   
   if (existingIndex >= 0) {
@@ -1613,7 +1647,9 @@ function setupEventListeners() {
 function initPWA() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('Edu STUDENT PWA Active.'))
+      .then(reg => {
+        reg.update();
+      })
       .catch(err => {});
   }
 }

@@ -1,25 +1,24 @@
-const CACHE_NAME = 'edustudent-v1';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './styles/main.css',
-  './scripts/app.js',
-  './scripts/firebase-config.js',
-  './scripts/ai-assistant.js',
-  './manifest.json',
-  './assets/hero_banner.jpg',
-  './assets/avatar.jpg',
-  './assets/course_ai.jpg'
-];
+const CACHE_NAME = 'edustudent-v2.0';
 
+// Install event - force immediate activation
 self.addEventListener('install', (e) => {
+  self.skipWaiting();
+});
+
+// Activate event - clear all old caches immediately
+self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
+// Network-First fetch strategy: always fetch latest version from server
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });
