@@ -838,14 +838,27 @@ async function fetchCloudChats() {
 
   const filtered = cloudChats.filter(c => c.chatKey === chatKey);
   AppState.chats = JSON.parse(localStorage.getItem('edu_user_chats')) || {};
-  AppState.chats[chatKey] = filtered.map(c => ({
-    id: c.id || ("msg_" + Date.now() + "_" + Math.floor(Math.random()*1000)),
-    sender: c.sender,
-    text: c.text,
-    time: c.time
-  }));
-  localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
-  renderChatMessages();
+  let localThread = AppState.chats[chatKey] || [];
+
+  if (filtered.length > 0) {
+    filtered.forEach(fc => {
+      const idx = localThread.findIndex(lt => (lt.id && fc.id && lt.id === fc.id) || (lt.text === fc.text && lt.sender === fc.sender && lt.time === fc.time));
+      if (idx >= 0) {
+        localThread[idx] = { ...localThread[idx], ...fc };
+      } else {
+        localThread.push({
+          id: fc.id || ("msg_" + Date.now() + "_" + Math.floor(Math.random()*1000)),
+          sender: fc.sender,
+          text: fc.text,
+          time: fc.time
+        });
+      }
+    });
+
+    AppState.chats[chatKey] = localThread;
+    localStorage.setItem('edu_user_chats', JSON.stringify(AppState.chats));
+    renderChatMessages();
+  }
 }
 
 // Render Messages between current user and target friend
