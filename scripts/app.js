@@ -452,6 +452,14 @@ async function fetchCloudVideos() {
 
 async function publishVideoToCloud(videoObj) {
   try {
+    await fetch(`${FIREBASE_SYNC_URL}/videos/v_${videoObj.id}.json`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(videoObj)
+    });
+  } catch (e) {}
+
+  try {
     await fetch(`${FIREBASE_SYNC_URL}/videos.json`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -466,6 +474,45 @@ async function publishVideoToCloud(videoObj) {
       body: JSON.stringify(videoObj)
     });
   } catch (e) {}
+}
+
+// 🎬 Fetch Global Published Videos from Multi-Cloud Realtime Engine (Phone <-> PC)
+async function fetchCloudVideos() {
+  let cloudVideos = [];
+  try {
+    const resFB = await fetch(`${FIREBASE_SYNC_URL}/videos.json`);
+    if (resFB.ok) {
+      const dataFB = await resFB.json();
+      if (dataFB) {
+        cloudVideos = Object.values(dataFB).filter(v => v && typeof v === 'object' && v.title);
+      }
+    }
+  } catch (e) {}
+
+  if (cloudVideos.length === 0) {
+    try {
+      const resCC = await fetch(`${CLOUD_SYNC_API}/videos`);
+      if (resCC.ok) {
+        const dataCC = await resCC.json();
+        if (Array.isArray(dataCC)) cloudVideos = dataCC;
+      }
+    } catch (e) {}
+  }
+
+  if (cloudVideos.length > 0) {
+    let localVideos = JSON.parse(localStorage.getItem('edu_admin_videos')) || [];
+    cloudVideos.forEach(cv => {
+      const idx = localVideos.findIndex(lv => lv.id === cv.id || lv.title === cv.title);
+      if (idx >= 0) {
+        localVideos[idx] = { ...localVideos[idx], ...cv };
+      } else {
+        localVideos.unshift(cv);
+      }
+    });
+
+    localStorage.setItem('edu_admin_videos', JSON.stringify(localVideos));
+    AppState.videos = localVideos;
+  }
 }
 
 // Sync Admin Videos between admin.html and main app

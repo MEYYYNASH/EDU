@@ -218,6 +218,14 @@
 
     async function publishVideoToCloud(videoObj) {
       try {
+        await fetch(`${FIREBASE_SYNC_URL}/videos/v_${videoObj.id}.json`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(videoObj)
+        });
+      } catch (e) {}
+
+      try {
         await fetch(`${FIREBASE_SYNC_URL}/videos.json`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
