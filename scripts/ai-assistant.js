@@ -105,34 +105,11 @@ window.EduAI = {
       };
     }
 
-    // Khmer Language Auto Response
-    if (/[\u1780-\u17FF]/.test(prompt)) {
-      if (p.includes("គណិត") || p.includes("math")) {
-        return `📐 **ចម្លើយស្វ័យប្រវត្តិកាត់គណិតវិទ្យា:**\nគណិតវិទ្យាជាគ្រឹះនៃវិទ្យាសាស្ត្រ និងបច្ចេកវិទ្យា។ ដើម្បីពូកែគណិតវិទ្យា សូមធ្វើលំហាត់ប្រចាំថ្ងៃ និងរំលឹកទ្រឹស្តីបទជាប្រចាំ!`;
-      }
-      return `✨ **ចម្លើយស្វ័យប្រវត្តិបញ្ញាសិប្បនិម្មិត:**\nខ្ញុំបានទទួលបានសំណួររបស់អ្នកគឺ: "${prompt}"។ ប្រព័ន្ធនឹងជួយអ្នកដោះស្រាយលំហាត់ និងផ្ដល់ការសិក្សាប្រកបដោយប្រសិទ្ធភាព!`;
+    // Friendly Greetings & Natural Study Responses
+    if (p.includes("hi") || p.includes("hello") || p.includes("hey") || p.includes("ជំរាបសួរ") || p.includes("សួស្តី")) {
+      return `Hi there! 👋 How is your study going today? Need help solving any math problems or calculus exercises?`;
     }
 
-    // Comprehensive Knowledge Base Auto-Responses
-    if (p.includes("pythagoras") || p.includes("pythagorean")) {
-      return `📐 **Pythagorean Theorem:**\nIn any right-angled triangle:\n• **a² + b² = c²** (where c is the hypotenuse opposite the right angle).\n• Example: If a = 3 and b = 4, then c = √(3² + 4²) = √(9 + 16) = 5.`;
-    }
-    if (p.includes("matrix") || p.includes("matrices")) {
-      return `📊 **Matrix Operations:**\nA matrix is a rectangular array of numbers arranged in rows and columns.\n• Addition & Subtraction: Performed element-wise on matrices of identical dimensions.\n• Multiplication (A · B): The number of columns in A must equal the number of rows in B.`;
-    }
-    if (p.includes("calculus") || p.includes("integral") || p.includes("limit")) {
-      return `♾️ **Calculus Overview:**\n• Differential Calculus: Analyzes rates of change and slopes of curves (f'(x)).\n• Integral Calculus: Calculates total accumulation and areas under curves (∫ f(x) dx).\n• Limits: Define continuity, derivatives, and integrals as values approach infinity or points.`;
-    }
-    if (p.includes("physics") || p.includes("force") || p.includes("newton")) {
-      return `⚛️ **Newton's Laws of Motion:**\n1. First Law (Inertia): Objects stay at rest or uniform velocity unless acted on by a force.\n2. Second Law: **F = m · a** (Force equals mass times acceleration).\n3. Third Law: For every action, there is an equal and opposite reaction.`;
-    }
-    if (p.includes("python") || p.includes("code") || p.includes("programming")) {
-      return `🐍 **Python Programming Guide:**\nPython is a clean, versatile language used for AI, Data Science, and Web Apps.\n• Key Data Structures: Lists \`[]\`, Dictionaries \`{}\`, Tuples \`()\`, Sets \`{}\`.\n• Example: \`def square(x): return x ** 2\``;
-    }
-    if (p.includes("study") || p.includes("remember") || p.includes("exam")) {
-      return `🧠 **Effective Study Techniques:**\n1. Active Recall: Test yourself with flashcards or quizzes instead of passive reading.\n2. Spaced Repetition: Review material at expanding time intervals (1 day, 3 days, 1 week).\n3. Feynman Technique: Explain concepts in simple terms as if teaching a beginner.`;
-    }
-
-    return `✨ **AI Auto-Responder:**\nI processed your query: "${prompt}".\n• Tip: You can ask me to solve linear equations like \`2x + 5 = 15\`, quadratic equations \`x^2 - 5x + 6 = 0\`, power derivatives \`d/dx x^3\`, or arithmetic calculations like \`250 * 4\`!`;
+    return `Thanks for your message! 📚 I'm working on math and calculus exercises right now. Let's study together!`;
   }
 };
