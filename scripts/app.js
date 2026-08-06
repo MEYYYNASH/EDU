@@ -1305,17 +1305,13 @@ async function handleSignUp(e) {
   }
 }
 
-// Handle Social Logins
-async function handleSocialLogin(provider) {
-  try {
-    let userData;
-    if (provider === 'google') userData = await window.EduFirebase.loginWithGoogle();
-    if (provider === 'github') userData = await window.EduFirebase.loginWithGitHub();
-    
-    saveUserSession(userData);
-    closeModal("auth-modal");
-  } catch (err) {
-    alert("Social Sign-in error: " + err.message);
+// Handle Social Logins (Coming Soon)
+function handleSocialLogin(provider) {
+  const isKm = AppState.lang === 'km';
+  if (provider === 'google') {
+    alert(isKm ? '🚀 ចូលគណនីតាម Google នឹងមកដល់ឆាប់ៗនេះ! (Coming Soon)' : '🚀 Google Sign-In is coming soon!');
+  } else if (provider === 'github') {
+    alert(isKm ? '🚀 ចូលគណនីតាម GitHub នឹងមកដល់ឆាប់ៗនេះ! (Coming Soon)' : '🚀 GitHub Sign-In is coming soon!');
   }
 }
 
