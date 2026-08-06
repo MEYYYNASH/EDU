@@ -15,7 +15,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles/main.css?v=2.9.0">
+  <link rel="stylesheet" href="styles/main.css?v=3.0.0">
 </head>
 <body>
 
@@ -291,9 +291,12 @@
             <button class="btn-secondary" onclick="openModal('tg-modal')"><i class="ri-telegram-line" style="color:#0088cc;"></i> <span data-i18n="tg_btn">Telegram Bot</span></button>
           </div>
 
-          <button class="btn-secondary" onclick="signOutUser()" style="width:100%; margin-top:12px; color:var(--color-danger); border-color:rgba(239,68,68,0.2);">
-            <i class="ri-logout-box-r-line"></i> <span data-i18n="signout_btn">Sign Out</span>
-          </button>
+          <!-- Dynamic Auth Action Container: Displays Sign In button when logged out, Sign Out button only when logged in -->
+          <div id="auth-action-btn-container">
+            <button class="btn-secondary" onclick="signOutUser()" style="width:100%; margin-top:12px; color:var(--color-danger); border-color:rgba(239,68,68,0.2);">
+              <i class="ri-logout-box-r-line"></i> <span data-i18n="signout_btn">Sign Out</span>
+            </button>
+          </div>
         </div>
 
       </section>
@@ -737,8 +740,8 @@
   </div>
 
   <!-- JavaScript Modules with Cache Buster -->
-  <script src="scripts/firebase-config.js?v=2.9.0"></script>
-  <script src="scripts/ai-assistant.js?v=2.9.0"></script>
-  <script src="scripts/app.js?v=2.9.0"></script>
+  <script src="scripts/firebase-config.js?v=3.0.0"></script>
+  <script src="scripts/ai-assistant.js?v=3.0.0"></script>
+  <script src="scripts/app.js?v=3.0.0"></script>
 </body>
 </html>

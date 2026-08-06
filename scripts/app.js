@@ -1093,6 +1093,8 @@ function checkPersistentAuth() {
 function updateAuthUI() {
   const accountBtn = document.getElementById("header-account-btn");
   const adminControlBtn = document.getElementById("admin-control-btn");
+  const authActionContainer = document.getElementById("auth-action-btn-container");
+  const isKm = AppState.lang === 'km';
   
   if (AppState.isLoggedIn) {
     if (accountBtn) {
@@ -1101,11 +1103,27 @@ function updateAuthUI() {
       accountBtn.title = `Signed in as ${AppState.user.name}`;
     }
     renderStudentCard();
+
+    if (authActionContainer) {
+      authActionContainer.innerHTML = `
+        <button class="btn-secondary" onclick="signOutUser()" style="width:100%; margin-top:12px; color:var(--color-danger); border-color:rgba(239,68,68,0.2);">
+          <i class="ri-logout-box-r-line"></i> <span data-i18n="signout_btn">${isKm ? 'ចាកចេញ' : 'Sign Out'}</span>
+        </button>
+      `;
+    }
   } else {
     if (accountBtn) {
       accountBtn.innerHTML = `<i class="ri-user-add-line"></i>`;
       accountBtn.onclick = () => openModal("auth-modal");
       accountBtn.title = "Sign In / Create Account";
+    }
+
+    if (authActionContainer) {
+      authActionContainer.innerHTML = `
+        <button class="btn-primary" onclick="openModal('auth-modal')" style="width:100%; margin-top:12px;">
+          <i class="ri-login-box-line"></i> <span data-i18n="signin_btn">${isKm ? 'ចូលគណនី / បង្កើតគណនី' : 'Sign In / Create Account'}</span>
+        </button>
+      `;
     }
   }
 
