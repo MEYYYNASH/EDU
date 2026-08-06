@@ -10,7 +10,7 @@ const ADMIN_EMAILS = [
 
 // Permanent Multi-Cloud Realtime Sync API Engine (Firebase Realtime REST + Crudcrud Fallback)
 const FIREBASE_SYNC_URL = "https://edu-student-2026-default-rtdb.firebaseio.com";
-const CLOUD_SYNC_API = "https://crudcrud.com/api/62187f58a74e4a9ab77d337d1e8d975a";
+const CLOUD_SYNC_API = "https://crudcrud.com/api/2ed6b13310c445d892a7568847859259";
 
 const initialNotes = [];
 const initialCourses = [];
@@ -120,6 +120,27 @@ function getCombinedUsers() {
   ];
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
   stored = stored.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
+
+  // Pre-seed real accounts Penhbormey011427809 & Sithpongrin4 so friends are ALWAYS visible in directory
+  if (!stored.some(u => u.email && u.email.toLowerCase() === "penhbormey011427809@gmail.com")) {
+    stored.push({
+      name: "Penhbormey011427809",
+      username: "penhbormey011427809",
+      email: "penhbormey011427809@gmail.com",
+      school: "Global Learning Institute",
+      avatar: "assets/default_avatar.jpg"
+    });
+  }
+
+  if (!stored.some(u => u.email && u.email.toLowerCase() === "sithpongrin4@gmail.com")) {
+    stored.push({
+      name: "Sithpongrin4",
+      username: "sithpongrin4",
+      email: "sithpongrin4@gmail.com",
+      school: "Global Learning Institute",
+      avatar: "assets/default_avatar.jpg"
+    });
+  }
 
   localStorage.setItem('edu_all_users', JSON.stringify(stored));
   return stored;
