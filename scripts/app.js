@@ -109,19 +109,18 @@ function getStoredCourses() {
   }
 }
 
-// Retrieve only registered users (filters out any old test accounts)
+// Retrieve all real registered users across devices (filters out old fake placeholder accounts)
 function getCombinedUsers() {
   const dummyEmails = [
     "student@edustudent.io",
     "github.dev@edustudent.io",
     "google.student@edustudent.io",
-    "penhbormey011427809@gmail.com",
-    "sithpongrin4@gmail.com",
     "sopheak@edustudent.io",
     "bormey@edustudent.io"
   ];
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
   stored = stored.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
+
   localStorage.setItem('edu_all_users', JSON.stringify(stored));
   return stored;
 }
@@ -578,8 +577,6 @@ async function fetchCloudUsers() {
     "student@edustudent.io",
     "github.dev@edustudent.io",
     "google.student@edustudent.io",
-    "penhbormey011427809@gmail.com",
-    "sithpongrin4@gmail.com",
     "sopheak@edustudent.io",
     "bormey@edustudent.io"
   ];
