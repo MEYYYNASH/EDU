@@ -111,8 +111,17 @@ function getStoredCourses() {
 
 // Retrieve only registered users (filters out any old test accounts)
 function getCombinedUsers() {
+  const dummyEmails = [
+    "student@edustudent.io",
+    "github.dev@edustudent.io",
+    "google.student@edustudent.io",
+    "penhbormey011427809@gmail.com",
+    "sithpongrin4@gmail.com",
+    "sopheak@edustudent.io",
+    "bormey@edustudent.io"
+  ];
   let stored = JSON.parse(localStorage.getItem('edu_all_users')) || [];
-  stored = stored.filter(u => u.email && u.email.toLowerCase() !== "sithpongrin4@gmail.com");
+  stored = stored.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
   localStorage.setItem('edu_all_users', JSON.stringify(stored));
   return stored;
 }
@@ -565,6 +574,16 @@ function deleteVideoAsAdmin(id) {
 
 // 🌐 Fetch Global Users from Multi-Cloud Realtime Sync Engine (Phone <-> PC)
 async function fetchCloudUsers() {
+  const dummyEmails = [
+    "student@edustudent.io",
+    "github.dev@edustudent.io",
+    "google.student@edustudent.io",
+    "penhbormey011427809@gmail.com",
+    "sithpongrin4@gmail.com",
+    "sopheak@edustudent.io",
+    "bormey@edustudent.io"
+  ];
+
   let cloudUsers = [];
   try {
     const resFB = await fetch(`${FIREBASE_SYNC_URL}/users.json`);
@@ -584,22 +603,26 @@ async function fetchCloudUsers() {
     } catch (e) {}
   }
 
-  if (cloudUsers.length > 0) {
-    let localUsers = getCombinedUsers();
-    cloudUsers.forEach(cu => {
-      if (cu.email) {
-        const idx = localUsers.findIndex(lu => lu.email && lu.email.toLowerCase() === cu.email.toLowerCase());
-        if (idx >= 0) {
-          localUsers[idx] = { ...localUsers[idx], ...cu };
-        } else {
-          localUsers.push(cu);
-        }
-      }
-    });
+  // Purge dummy accounts from cloud returned list
+  cloudUsers = cloudUsers.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
 
-    AppState.allUsers = getCombinedUsers();
-    renderCommunityUsers();
-  }
+  let localUsers = getCombinedUsers();
+  cloudUsers.forEach(cu => {
+    if (cu.email && !dummyEmails.includes(cu.email.toLowerCase())) {
+      const idx = localUsers.findIndex(lu => lu.email && lu.email.toLowerCase() === cu.email.toLowerCase());
+      if (idx >= 0) {
+        localUsers[idx] = { ...localUsers[idx], ...cu };
+      } else {
+        localUsers.push(cu);
+      }
+    }
+  });
+
+  localUsers = localUsers.filter(u => u.email && !dummyEmails.includes(u.email.toLowerCase()));
+  localStorage.setItem('edu_all_users', JSON.stringify(localUsers));
+
+  AppState.allUsers = localUsers;
+  renderCommunityUsers();
 }
 
 // 👥 Render Student Directory with Search Filter & Friends System (Real Users Only)
